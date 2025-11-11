@@ -93,7 +93,7 @@ class Student(User):
             return
         print("Available courses:")
         for c in courses:
-            print(f"  {c['course_id']}: {c['name']}")
+            print(f"  {c['course_id']}: {c['course_name']}")
         cid = input("Enter course id to enroll: ").strip()
         if cid in (self.enrolled or []):
             print("Already enrolled.")
