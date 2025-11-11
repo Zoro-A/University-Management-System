@@ -1,5 +1,26 @@
 [
-  {"course_id":"CSE101","name":"Intro to CS","eligible_faculty":["F1","F2"]},
-  {"course_id":"CSE102","name":"Data Structures","eligible_faculty":["F2"]},
-  {"course_id":"MTH101","name":"Calculus I","eligible_faculty":["F3"]}
+  {
+    "course_id": "CS101",
+    "course_name": "Introduction to Programming",
+    "faculty_id": "F001",
+    "credits": 3
+  },
+  {
+    "course_id": "MA102",
+    "course_name": "Calculus I",
+    "faculty_id": "F002",
+    "credits": 3
+  },
+  {
+    "course_id": "PH103",
+    "course_name": "Physics I",
+    "faculty_id": "F003",
+    "credits": 4
+  },
+  {
+    "course_id": "EN105",
+    "course_name": "English Composition",
+    "faculty_id": "F004",
+    "credits": 2
+  }
 ]
