@@ -1,0 +1,30 @@
+[
+  {
+    "course_id": "CS101",
+    "faculty_id": "F001",
+    "day": "Monday",
+    "time": "09:00 AM - 10:30 AM",
+    "room": "C-201"
+  },
+  {
+    "course_id": "MA102",
+    "faculty_id": "F002",
+    "day": "Tuesday",
+    "time": "10:45 AM - 12:15 PM",
+    "room": "B-105"
+  },
+  {
+    "course_id": "PH103",
+    "faculty_id": "F003",
+    "day": "Wednesday",
+    "time": "01:00 PM - 02:30 PM",
+    "room": "A-303"
+  },
+  {
+    "course_id": "EN105",
+    "faculty_id": "F004",
+    "day": "Thursday",
+    "time": "09:00 AM - 10:30 AM",
+    "room": "B-110"
+  }
+]

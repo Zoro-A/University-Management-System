@@ -1,0 +1,22 @@
+[
+  {
+    "student_id": "S001",
+    "course_id": "CS101",
+    "grade": "A"
+  },
+  {
+    "student_id": "S001",
+    "course_id": "MA102",
+    "grade": "B+"
+  },
+  {
+    "student_id": "S002",
+    "course_id": "EN105",
+    "grade": "A-"
+  },
+  {
+    "student_id": "S002",
+    "course_id": "CS101",
+    "grade": "B"
+  }
+]
