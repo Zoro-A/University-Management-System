@@ -1,0 +1,4 @@
+[
+  {"user_id":"S1","name":"Student One","email":"s1@uni.edu","password":"s1pass","enrolled":["CSE101"]},
+  {"user_id":"S2","name":"Student Two","email":"s2@uni.edu","password":"s2pass","enrolled":[]}
+]
