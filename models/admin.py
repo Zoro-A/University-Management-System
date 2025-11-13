@@ -77,11 +77,12 @@ class Admin(User):
         name = input("Course name: ").strip()
         facs = input("Comma separated eligible faculty ids (optional): ").strip().split(",")
         facs = [f.strip() for f in facs if f.strip()]
+        crhrs=input("Enter the credit hours for this course: ").strip()
         courses = FileManager.read_file(COURSES_FILE)
         if any(c['course_id'] == cid for c in courses):
             print("Course id already exists.")
             return
-        rec = {"course_id": cid, "course_name": name, "eligible_faculty": facs}
+        rec = {"course_id": cid, "course_name": name, "eligible_faculty": facs, "credits": crhrs}
         FileManager.append_record(COURSES_FILE, rec)
         print("Course added.")
 
