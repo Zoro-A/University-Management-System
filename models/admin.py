@@ -81,7 +81,7 @@ class Admin(User):
         if any(c['course_id'] == cid for c in courses):
             print("Course id already exists.")
             return
-        rec = {"course_id": cid, "name": name, "eligible_faculty": facs}
+        rec = {"course_id": cid, "course_name": name, "eligible_faculty": facs}
         FileManager.append_record(COURSES_FILE, rec)
         print("Course added.")
 
@@ -98,7 +98,7 @@ class Admin(User):
             print("No courses.")
             return
         for c in courses:
-            print(f"{c['course_id']}: {c['name']} Eligible: {','.join(c.get('eligible_faculty',[]))}")
+            print(f"{c['course_id']}: {c['course_name']} Eligible: {','.join(c.get('eligible_faculty',[]))}")
 
     def manage_users(self):
         while True:
