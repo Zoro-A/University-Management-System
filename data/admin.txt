@@ -1,7 +1,7 @@
 [
   {
     "user_id": "A1",
-    "name": "Mahhee
+    "name": "Mahhee",
     "email": "mahheeahmar@gmail.com",
     "password": "mahhee123"
   }
