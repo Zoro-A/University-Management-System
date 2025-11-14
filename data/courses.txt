@@ -4,25 +4,21 @@
     "course_name": "Programming Fundamentals",
     "eligible_faculty": [],
     "credits": "3",
-    "prerequisites": []
+    "prerequisite": ""
   },
   {
     "course_id": "CS101",
     "course_name": "OOP",
     "eligible_faculty": [],
     "credits": "3",
-    "prerequisites": [
-      "CS100"
-    ]
+    "prerequisite":"CS100"
   },
   {
     "course_id": "CS102",
     "course_name": "Data Structures",
     "eligible_faculty": [],
     "credits": "3",
-    "prerequisites": [
-      "CS100",
-      "CS101"
-    ]
+    "prerequisite": "CS101"
+    
   }
 ]

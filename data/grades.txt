@@ -1,22 +1,22 @@
 [
   {
-    "student_id": "S001",
-    "course_id": "CS101",
+    "student_id": "S1",
+    "course_id": "CS100",
     "grade": "A"
   },
   {
-    "student_id": "S001",
-    "course_id": "MA102",
+    "student_id": "S1",
+    "course_id": "CS101",
     "grade": "B+"
   },
   {
-    "student_id": "S002",
-    "course_id": "EN105",
+    "student_id": "S2",
+    "course_id": "CS100",
     "grade": "A-"
   },
   {
-    "student_id": "S002",
+    "student_id": "S2",
     "course_id": "CS101",
-    "grade": "B"
+    "grade": "F"
   }
 ]
