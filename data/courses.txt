@@ -11,7 +11,7 @@
     "course_name": "OOP",
     "eligible_faculty": [],
     "credits": "3",
-    "prerequisite":"CS100"
+    "prerequisite": "CS100"
   },
   {
     "course_id": "CS102",
@@ -19,6 +19,19 @@
     "eligible_faculty": [],
     "credits": "3",
     "prerequisite": "CS101"
-    
+  },
+  {
+    "course_id": "CS200",
+    "course_name": "Database Systems",
+    "eligible_faculty": [],
+    "credits": "3",
+    "prerequisites": "CS102"
+  },
+  {
+    "course_id": "CS201",
+    "course_name": "Operating Systems",
+    "eligible_faculty": [],
+    "credits": "3",
+    "prerequisites": ""
   }
 ]
