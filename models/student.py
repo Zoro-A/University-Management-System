@@ -88,23 +88,59 @@ class Student(User):
 
     def enroll_course(self):
         courses = FileManager.read_file(COURSES_FILE)
+        grades = FileManager.read_file(GRADES_FILE)
+
         if not courses:
             print("No courses available.")
             return
+
+        # Show all courses
         print("Available courses:")
         for c in courses:
             print(f"  {c['course_id']}: {c['course_name']}")
+
         cid = input("Enter course id to enroll: ").strip()
+
+        # Already enrolled?
         if cid in (self.enrolled or []):
-            print("Already enrolled.")
+            print("Already enrolled in this course.")
             return
-        if any(c['course_id'] == cid for c in courses):
+
+        # Find the course
+        course = next((c for c in courses if c['course_id'] == cid), None)
+        if not course:
+            print("Invalid course ID.")
+            return
+
+        prereq = course.get("prerequisite", "").strip()
+
+        # No prerequisite → enroll directly
+        if prereq == "":
             self.enrolled.append(cid)
             self._persist_self()
             print(f"Enrolled in {cid}.")
-        else:
-            print("Course not found.")
+            return
 
+        # Otherwise check if the student passed the prerequisite
+        prereq_grade = next(
+            (g for g in grades if g["student_id"] == self.user_id and g["course_id"] == prereq),
+            None
+        )
+
+        # Student never took the prerequisite
+        if prereq_grade is None:
+            print(f"You must complete prerequisite course {prereq} before taking {cid}.")
+            return
+
+        # Student took prerequisite but failed
+        if prereq_grade["grade"] == "F":
+            print(f"You did not pass prerequisite {prereq}. Cannot enroll in {cid}.")
+            return
+
+        # Student passed prerequisite → enroll
+        self.enrolled.append(cid)
+        self._persist_self()
+        print(f"Enrolled in {cid}.")
     def drop_course(self):
         if not self.enrolled:
             print("You are not enrolled in any courses.")
