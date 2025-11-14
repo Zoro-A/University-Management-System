@@ -61,13 +61,20 @@ class Student(User):
 
     def view_transcript(self):
         grades = FileManager.read_file(GRADES_FILE)
-        my_grades = [g for g in grades if g.get("student_id") == self.user_id]
-        if not my_grades:
-            print("No grades found.")
+        if not grades:
+            print("No grades available.")
             return
-        print("Transcript:")
+
+        my_grades = [g for g in grades if g["student_id"] == self.user_id]
+
+        if not my_grades:
+            print("No grades found for your ID.")
+            return
+
+        print("\n=== Transcript ===")
         for g in my_grades:
-            print(f"  {g['course_id']}: {g['grade']}")
+            print(f"{g['course_id']}: {g['grade']}")
+
 
     def view_timetable(self):
         tt = FileManager.read_file(TIMETABLE_FILE)
@@ -141,18 +148,25 @@ class Student(User):
         self.enrolled.append(cid)
         self._persist_self()
         print(f"Enrolled in {cid}.")
+        
     def drop_course(self):
         if not self.enrolled:
             print("You are not enrolled in any courses.")
             return
-        print("Your enrolled courses:", ", ".join(self.enrolled))
+
+        print("Your enrolled courses:")
+        for c in self.enrolled:
+            print(f" - {c}")
+
         cid = input("Enter course id to drop: ").strip()
-        if cid in (self.enrolled or []):
-            self.enrolled.remove(cid)
-            self._persist_self()
-            print(f"Dropped {cid}.")
-        else:
-            print("You are not enrolled in that course.")
+
+        if cid not in self.enrolled:
+            print("You are not enrolled in this course.")
+            return
+
+        self.enrolled.remove(cid)
+        self._persist_self()
+        print(f"Dropped course {cid}.")
 
     def view_notifications(self):
         notifs = FileManager.read_file(NOTIF_FILE)

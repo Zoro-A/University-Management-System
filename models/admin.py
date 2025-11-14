@@ -78,8 +78,7 @@ class Admin(User):
         facs = input("Comma separated eligible faculty ids (optional): ").strip().split(",")
         facs = [f.strip() for f in facs if f.strip()]
         crhrs=input("Enter the credit hours for this course: ").strip()
-        preReqs = input("Enter the prerequisite course ids (comma separated, optional): ").strip().split(",")
-        preReqs = [p.strip() for p in preReqs if p.strip()]
+        preReqs = input("Enter the prerequisite course id (if any): ").strip()
         courses = FileManager.read_file(COURSES_FILE)
         if any(c['course_id'] == cid for c in courses):
             print("Course id already exists.")
