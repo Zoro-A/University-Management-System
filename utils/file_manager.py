@@ -1,49 +1,86 @@
-# utils/file_manager.py
 import json
 import os
 import shutil
 
-class FileManager:
-    @staticmethod
-    def ensure_file(filename):
-        dirpath = os.path.dirname(filename)
-        if dirpath:
-            os.makedirs(dirpath, exist_ok=True)
-        if not os.path.exists(filename):
-            with open(filename, "w", encoding="utf-8") as f:
-                f.write("[]")
+# -----------------------------------------
+# BASE PROJECT DIRECTORY
+# utils/file_manager.py → go one level up → project root
+# -----------------------------------------
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    @staticmethod
-    def read_file(filename):
-        if not os.path.exists(filename):
-            return []
-        with open(filename, "r", encoding="utf-8") as f:
-            content = f.read().strip()
-            if not content:
-                return []
-            try:
-                return json.loads(content)
-            except json.JSONDecodeError:
-                return []
+# -----------------------------------------
+# DATA DIRECTORY INSIDE PROJECT ROOT
+# Example: D:/University-Management-System/data
+# -----------------------------------------
+DATA_DIR = os.path.join(BASE_DIR, "data")
 
-    @staticmethod
-    def write_file(filename, data):
-        dirpath = os.path.dirname(filename)
-        if dirpath:
-            os.makedirs(dirpath, exist_ok=True)
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+# Ensure data folder exists
+os.makedirs(DATA_DIR, exist_ok=True)
 
-    @staticmethod
-    def append_record(filename, record):
-        data = FileManager.read_file(filename)
-        data.append(record)
-        FileManager.write_file(filename, data)
 
-    @staticmethod
-    def backup_folder(src_folder, dest_folder):
-        os.makedirs(dest_folder, exist_ok=True)
-        for name in os.listdir(src_folder):
-            full = os.path.join(src_folder, name)
-            if os.path.isfile(full):
-                shutil.copy(full, dest_folder)
+# -----------------------------------------
+# READ JSON FILE
+# -----------------------------------------
+def read_file(path):
+    full_path = os.path.join(DATA_DIR, path)
+
+    if not os.path.exists(full_path):
+        return []
+
+    try:
+        with open(full_path, "r") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        print(f"[ERROR] Invalid JSON in {full_path}")
+        return []
+
+
+# -----------------------------------------
+# WRITE JSON FILE
+# -----------------------------------------
+def write_file(path, data):
+    full_path = os.path.join(DATA_DIR, path)
+    with open(full_path, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+# -----------------------------------------
+# APPEND TO JSON FILE
+# -----------------------------------------
+def append_record(path, record):
+    data = read_file(path)
+
+    if not isinstance(data, list):
+        raise ValueError(f"{path} must contain a JSON list")
+
+    data.append(record)
+    write_file(path, data)
+
+
+# -----------------------------------------
+# UPDATE RECORD
+# -----------------------------------------
+def update_record(path, key, value, new_data: dict):
+    data = read_file(path)
+    updated = False
+
+    for item in data:
+        if item.get(key) == value:
+            item.update(new_data)
+            updated = True
+            break
+
+    if updated:
+        write_file(path, data)
+
+    return updated
+
+
+# -----------------------------------------
+# DELETE RECORD
+# -----------------------------------------
+def delete_record(path, key, value):
+    data = read_file(path)
+    data = [item for item in data if item.get(key) != value]
+    write_file(path, data)
+    return True
