@@ -1,108 +1,79 @@
-from models.user import User
-from utils.file_manager import FileManager
+from models.user import UserModel
+from utils.file_manager import read_file, write_file, append_record
 
-FAC_FILE = "data/faculty.txt"
-GRADES_FILE = "data/grades.txt"
-COURSES_FILE = "data/courses.txt"
-NOTIF_FILE = "data/notifications.txt"
-TIMETABLE_FILE = "data/timetable.txt"
-STUDENTS_FILE = "data/students.txt"
+FAC_FILE = "faculty.txt"
+STUDENTS_FILE = "students.txt"
+GRADES_FILE = "grades.txt"
+COURSES_FILE = "courses.txt"
+TIMETABLE_FILE = "timetable.txt"
+NOTIF_FILE = "notifications.txt"
 
-class Faculty(User):
+
+class FacultyModel(UserModel):
     FILE = FAC_FILE
 
     def __init__(self, user_id, name, email, password, courses=None):
         super().__init__(user_id, name, email, password)
         self.courses = courses or []
 
-    @staticmethod
-    def login():
-        email = input("Faculty email: ").strip()
-        password = input("Password: ").strip()
-        rec = User.authenticate(Faculty.FILE, email, password)
-        if rec:
-            print(f"Welcome, Prof. {rec['name']}!")
-            return Faculty(**rec)
-        else:
-            print("Invalid credentials.")
-            return None
+    # ------------------------ STATIC HELPERS ------------------------
 
-    def interactive_menu(self):
-        while True:
-            print(f"\n--- Faculty: {self.name} ---")
-            print("1. View Assigned Courses")
-            print("2. View Students (for a course)")
-            print("3. Assign/Edit Grade")
-            print("4. Send Notification")
-            print("5. View Timetable")
-            print("6. Logout")
-            c = input("Choice: ").strip()
-            if c == "1":
-                self.view_assigned_courses()
-            elif c == "2":
-                self.view_students_for_course()
-            elif c == "3":
-                self.assign_grade()
-            elif c == "4":
-                self.send_notification()
-            elif c == "5":
-                self.view_timetable()
-            elif c == "6":
-                break
-            else:
-                print("Invalid choice.")
+    @staticmethod
+    def get_by_id(faculty_id: str):
+        records = read_file(FAC_FILE)
+        rec = next((x for x in records if x["user_id"] == faculty_id), None)
+        if not rec:
+            return None
+        return FacultyModel(**rec)
+
+    # ------------------------ BUSINESS LOGIC ------------------------
 
     def view_assigned_courses(self):
-        print("Courses you can teach:", ", ".join(self.courses) if self.courses else "None")
+        return self.courses
 
-    def view_students_for_course(self):
-        cid = input("Course id: ").strip()
-        students = FileManager.read_file(STUDENTS_FILE)
-        enrolled_students = [s for s in students if cid in (s.get("enrolled") or [])]
-        if not enrolled_students:
-            print("No students enrolled or course not found.")
-            return
-        print(f"Students in {cid}:")
-        for s in enrolled_students:
-            print(f"  {s['user_id']} - {s['name']}")
+    def view_students_for_course(self, course_id: str):
+        students = read_file(STUDENTS_FILE)
+        enrolled = [s for s in students if course_id in s.get("enrolled", [])]
+        return enrolled
 
-    def assign_grade(self):
-        cid = input("Course id: ").strip()
-        sid = input("Student id: ").strip()
-        grade = input("Grade (e.g., A, B+, 78): ").strip()
-        students = FileManager.read_file(STUDENTS_FILE)
-        student = next((s for s in students if s.get("user_id") == sid), None)
-        if not student or cid not in (student.get("enrolled") or []):
-            print("Student not enrolled in this course or not found.")
-            return
-        grades = FileManager.read_file(GRADES_FILE)
+    def assign_grade(self, student_id: str, course_id: str, grade: str):
+        students = read_file(STUDENTS_FILE)
+        student = next((s for s in students if s["user_id"] == student_id), None)
+
+        if not student:
+            raise ValueError("Student not found")
+
+        if course_id not in student.get("enrolled", []):
+            raise ValueError("Student not enrolled in this course")
+
+        grades = read_file(GRADES_FILE)
         updated = False
+
         for g in grades:
-            if g.get("student_id") == sid and g.get("course_id") == cid:
+            if g["student_id"] == student_id and g["course_id"] == course_id:
                 g["grade"] = grade
                 updated = True
                 break
-        if not updated:
-            grades.append({"student_id": sid, "course_id": cid, "grade": grade})
-        FileManager.write_file(GRADES_FILE, grades)
-        print("Grade assigned/updated.")
 
-    def send_notification(self):
-        target = input("Send to (student_id/all): ").strip()
-        message = input("Message: ").strip()
-        notifs = FileManager.read_file(NOTIF_FILE)
-        if target.lower() == "all":
-            notifs.append({"to": "all", "from": self.user_id, "message": message})
-        else:
-            notifs.append({"to": target, "from": self.user_id, "message": message})
-        FileManager.write_file(NOTIF_FILE, notifs)
-        print("Notification sent.")
+        if not updated:
+            grades.append({
+                "student_id": student_id,
+                "course_id": course_id,
+                "grade": grade
+            })
+
+        write_file(GRADES_FILE, grades)
+
+    def send_notification(self, target: str, message: str):
+        notifs = read_file(NOTIF_FILE)
+        notifs.append({
+            "to": target,
+            "from": self.user_id,
+            "message": message
+        })
+        write_file(NOTIF_FILE, notifs)
 
     def view_timetable(self):
-        tt = FileManager.read_file(TIMETABLE_FILE)
-        mine = [s for s in tt if s.get("faculty_id") == self.user_id]
-        if not mine:
-            print("No timetable entries assigned.")
-            return
-        for s in mine:
-            print(f"{s['day']} {s['slot']} - {s['course_id']} ({s['course_name']}) - Room {s['room']}")
+        tt = read_file(TIMETABLE_FILE)
+        mine = [x for x in tt if x.get("faculty_id") == self.user_id]
+        return mine
