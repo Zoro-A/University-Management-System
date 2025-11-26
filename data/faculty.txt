@@ -4,37 +4,27 @@
     "name": "Alice",
     "email": "alice@uni.edu",
     "password": "pass1",
-    "courses": [
-      "CSE101"
-    ]
+    "courses": ["CSE101"]
   },
   {
     "user_id": "F2",
     "name": "Bob",
     "email": "bob@uni.edu",
     "password": "pass2",
-    "courses": [
-      "CSE101",
-      "CSE102"
-    ]
+    "courses": ["CSE101", "CSE102"]
   },
   {
     "user_id": "F3",
     "name": "Carol",
     "email": "carol@uni.edu",
     "password": "pass3",
-    "courses": [
-      "MTH101"
-    ]
-  }
+    "courses": ["MTH101"]
+  },
   {
-    "user_id":"F4",
-    "name":"Mahhee",
-    "email":"mahheeahmar@gmail.com",
-    "password":"mahhee123",
-    "courses":[
-      "CS100",
-      "CS201"
-    ]
+    "user_id": "F4",
+    "name": "Mahhee",
+    "email": "mahheeahmar@gmail.com",
+    "password": "mahhee123",
+    "courses": ["CS100", "CS201"]
   }
 ]

@@ -1,38 +1,47 @@
 [
-  {
-    "course_id": "EN105",
-    "course_name": "",
-    "faculty_id": "F1",
-    "faculty_name": "Alice",
-    "day": "Mon",
-    "slot": "S3",
-    "room": "F202"
-  },
-  {
-    "course_id": "MA102",
-    "course_name": "",
-    "faculty_id": "F1",
-    "faculty_name": "Alice",
-    "day": "Tue",
-    "slot": "S3",
-    "room": "F201"
-  },
-  {
-    "course_id": "PH103",
-    "course_name": "",
-    "faculty_id": "F3",
-    "faculty_name": "Carol",
-    "day": "Thu",
-    "slot": "S1",
-    "room": "F202"
-  },
-  {
-    "course_id": "CS101",
-    "course_name": "",
-    "faculty_id": "F2",
-    "faculty_name": "Bob",
-    "day": "Fri",
-    "slot": "S2",
-    "room": "F201"
-  }
+    {
+        "course_id": "CS100",
+        "course_name": "",
+        "faculty_id": "F4",
+        "faculty_name": "Mahhee",
+        "day": "Mon",
+        "slot": "S3",
+        "room": "F201,F202,F203,F204"
+    },
+    {
+        "course_id": "CS102",
+        "course_name": "",
+        "faculty_id": "F2",
+        "faculty_name": "Bob",
+        "day": "Mon",
+        "slot": "S3",
+        "room": "F201,F202,F203,F204"
+    },
+    {
+        "course_id": "CS101",
+        "course_name": "",
+        "faculty_id": "F4",
+        "faculty_name": "Mahhee",
+        "day": "Wed",
+        "slot": "S2",
+        "room": "F201,F202,F203,F204"
+    },
+    {
+        "course_id": "CS201",
+        "course_name": "",
+        "faculty_id": "F4",
+        "faculty_name": "Mahhee",
+        "day": "Thu",
+        "slot": "S3",
+        "room": "F201,F202,F203,F204"
+    },
+    {
+        "course_id": "CS200",
+        "course_name": "",
+        "faculty_id": "F4",
+        "faculty_name": "Mahhee",
+        "day": "Fri",
+        "slot": "S2",
+        "room": "F201,F202,F203,F204"
+    }
 ]

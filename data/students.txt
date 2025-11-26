@@ -1,35 +1,35 @@
 [
-  {
-    "user_id": "S1",
-    "name": "Mahhee",
-    "email": "mahheeahmar@gmail.com",
-    "password": "mahhee123",
-    "enrolled": [
-      "CSE101",
-      "CS101",
-      "PH103"
-    ]
-  },
     {
-    "user_id": "S2",
-    "name": "Faizan",
-    "email": "malikfaizan@gmail.com",
-    "password": "faizan123",
-    "enrolled": [
-      "CSE101",
-      "CS101",
-      "PH103"
-    ]
-  },
+        "user_id": "S1",
+        "name": "Mahhee",
+        "email": "mahheeahmar@gmail.com",
+        "password": "mahhee123",
+        "enrolled": [
+            "CSE101",
+            "CS101",
+            "PH103"
+        ]
+    },
     {
-    "user_id": "S3",
-    "name": "Hamza",
-    "email": "hamzahussain@gmail.com",
-    "password": "hamza123",
-    "enrolled": [
-      "CSE101",
-      "CS101",
-      "PH103"
-    ]
-  }
+        "user_id": "S2",
+        "name": "Faizan",
+        "email": "malikfaizan@gmail.com",
+        "password": "faizan123",
+        "enrolled": [
+            "CSE101",
+            "CS101",
+            "PH103"
+        ]
+    },
+    {
+        "user_id": "S3",
+        "name": "Hamza",
+        "email": "hamzahussain@gmail.com",
+        "password": "hamza123",
+        "enrolled": [
+            "CSE101",
+            "CS101",
+            "PH103"
+        ]
+    }
 ]

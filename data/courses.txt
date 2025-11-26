@@ -1,37 +1,37 @@
 [
-  {
-    "course_id": "CS100",
-    "course_name": "Programming Fundamentals",
-    "eligible_faculty": [],
-    "credits": "3",
-    "prerequisite": ""
-  },
-  {
-    "course_id": "CS101",
-    "course_name": "OOP",
-    "eligible_faculty": [],
-    "credits": "3",
-    "prerequisite": "CS100"
-  },
-  {
-    "course_id": "CS102",
-    "course_name": "Data Structures",
-    "eligible_faculty": [],
-    "credits": "3",
-    "prerequisite": "CS101"
-  },
-  {
-    "course_id": "CS200",
-    "course_name": "Database Systems",
-    "eligible_faculty": [],
-    "credits": "3",
-    "prerequisites": "CS102"
-  },
-  {
-    "course_id": "CS201",
-    "course_name": "Operating Systems",
-    "eligible_faculty": [],
-    "credits": "3",
-    "prerequisites": ""
-  }
+    {
+        "course_id": "CS100",
+        "course_name": "Programming Fundamentals",
+        "eligible_faculty": [],
+        "credits": "3",
+        "prerequisite": ""
+    },
+    {
+        "course_id": "CS101",
+        "course_name": "OOP",
+        "eligible_faculty": [],
+        "credits": "3",
+        "prerequisite": "CS100"
+    },
+    {
+        "course_id": "CS102",
+        "course_name": "Data Structures",
+        "eligible_faculty": [],
+        "credits": "3",
+        "prerequisite": "CS101"
+    },
+    {
+        "course_id": "CS200",
+        "course_name": "Database Systems",
+        "eligible_faculty": [],
+        "credits": "3",
+        "prerequisites": "CS102"
+    },
+    {
+        "course_id": "CS201",
+        "course_name": "Operating Systems",
+        "eligible_faculty": [],
+        "credits": "3",
+        "prerequisites": ""
+    }
 ]
