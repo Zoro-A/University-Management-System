@@ -17,7 +17,6 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 # Ensure data folder exists
 os.makedirs(DATA_DIR, exist_ok=True)
 
-
 # -----------------------------------------
 # READ JSON FILE
 # -----------------------------------------
