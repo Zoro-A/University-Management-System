@@ -2,21 +2,31 @@
   {
     "student_id": "S1",
     "course_id": "CS100",
-    "grade": "A"
+    "grade": "A",
+    "year": 2022
   },
   {
     "student_id": "S1",
     "course_id": "CS101",
-    "grade": "B+"
+    "grade": "B+",
+    "year": 2022
+  },
+  {
+    "student_id": "S1",
+    "course_id": "CS201",
+    "grade": "A-",
+    "year": 2023
   },
   {
     "student_id": "S2",
     "course_id": "CS100",
-    "grade": "A-"
+    "grade": "A-",
+    "year": 2022
   },
   {
     "student_id": "S2",
     "course_id": "CS101",
-    "grade": "F"
+    "grade": "F",
+    "year": 2022
   }
 ]

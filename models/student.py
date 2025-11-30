@@ -106,7 +106,25 @@ class StudentModel(UserModel):
     # ------------------------------------------------------
     def get_transcript(self):
         grades = read_file(GRADES_FILE)
-        return [g for g in grades if g["student_id"] == self.user_id]
+
+        # Filter only this student's grades
+        student_grades = [g for g in grades if g["student_id"] == self.user_id]
+
+        transcript = {}
+
+        for g in student_grades:
+            year = str(g.get("year", "Unknown"))
+
+            if year not in transcript:
+                transcript[year] = []
+
+            transcript[year].append({
+                "course": g["course_id"],
+                "grade": g["grade"]
+            })
+
+        return transcript
+
 
     # ------------------------------------------------------
     # 4. NOTIFICATIONS
