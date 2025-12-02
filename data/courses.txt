@@ -4,21 +4,21 @@
         "course_name": "Programming Fundamentals",
         "eligible_faculty": [],
         "credits": "3",
-        "prerequisite": ""
+        "prerequisites": ""
     },
     {
         "course_id": "CS101",
         "course_name": "OOP",
         "eligible_faculty": [],
         "credits": "3",
-        "prerequisite": "CS100"
+        "prerequisites": "CS100"
     },
     {
         "course_id": "CS102",
         "course_name": "Data Structures",
         "eligible_faculty": [],
         "credits": "3",
-        "prerequisite": "CS101"
+        "prerequisites": "CS101"
     },
     {
         "course_id": "CS200",
@@ -33,5 +33,35 @@
         "eligible_faculty": [],
         "credits": "3",
         "prerequisites": ""
+    },
+    {
+        "course_id": "EE100",
+        "course_name": "DLD",
+        "eligible_faculty": [],
+        "credits": 3,
+        "prerequisites": ""
+    },
+    {
+        "course_id": "EE200",
+        "course_name": "LC",
+        "eligible_faculty": [],
+        "credits": 3,
+        "prerequisites": ""
+    },
+    {
+        "course_id":"MTH101",
+        "course_name":"Calculus and Analytical Geometery",
+        "eligible_faculty":[],
+        "credits":3,
+        "prerequisites":""
     }
+    ,
+    {
+        "course_id":"PH103",
+        "course_name":"Applied Physics",
+        "eligible_faculty":[],
+        "credits":3,
+        "prerequisites":""
+    }
+    
 ]
