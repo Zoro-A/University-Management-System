@@ -10,7 +10,7 @@ class TimetableGenerator:
         for c in courses:
             course_list.append({
                 "course_id": c["course_id"],
-                "course_name": c.get("name", ""),
+                "course_name": c.get("course_name", ""),
                 "eligible": c.get("eligible_faculty", []) or []
             })
 
