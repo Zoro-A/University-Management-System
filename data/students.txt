@@ -5,7 +5,6 @@
         "email": "mahheeahmar@gmail.com",
         "password": "mahhee123",
         "enrolled": [
-            "CSE101",
             "CS101",
             "PH103"
         ]
@@ -16,7 +15,6 @@
         "email": "malikfaizan@gmail.com",
         "password": "faizan123",
         "enrolled": [
-            "CSE101",
             "CS101",
             "PH103"
         ]
@@ -27,9 +25,15 @@
         "email": "hamzahussain@gmail.com",
         "password": "hamza123",
         "enrolled": [
-            "CSE101",
             "CS101",
             "PH103"
         ]
+    },
+    {
+        "user_id": "S4",
+        "name": "Ahmad",
+        "email": "ahmad@gmail.com",
+        "password": "ahmad123",
+        "enrolled": []
     }
 ]
