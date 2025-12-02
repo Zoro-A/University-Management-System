@@ -4,7 +4,7 @@ from utils.file_manager import read_file, write_file
 
 class FileGradesRepository(IGradeRepository):
 
-    def __init__(self, filepath="data/grades.txt"):
+    def __init__(self, filepath="grades.txt"):
         self.filepath = filepath
 
     def get_all(self):
