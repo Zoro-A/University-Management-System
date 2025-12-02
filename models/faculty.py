@@ -1,52 +1,84 @@
+# models/faculty_model.py
+
 from models.user import UserModel
-from utils.file_manager import read_file, write_file, append_record
-
-FAC_FILE = "faculty.txt"
-STUDENTS_FILE = "students.txt"
-GRADES_FILE = "grades.txt"
-COURSES_FILE = "courses.txt"
-TIMETABLE_FILE = "timetable.txt"
-NOTIF_FILE = "notifications.txt"
-
 
 class FacultyModel(UserModel):
-    FILE = FAC_FILE
-
-    def __init__(self, user_id, name, email, password, courses=None):
+    def __init__(
+        self,
+        repo_faculty,
+        repo_student,
+        repo_grades,
+        repo_course,
+        repo_notifications,
+        repo_timetable,
+        user_id,
+        name,
+        email,
+        password,
+        courses=None
+    ):
         super().__init__(user_id, name, email, password)
+
+        self.faculty_repo = repo_faculty
+        self.student_repo = repo_student
+        self.grades_repo = repo_grades
+        self.course_repo = repo_course
+        self.notifications_repo = repo_notifications
+        self.timetable_repo = repo_timetable
+
         self.courses = courses or []
 
-    # ------------------------ STATIC HELPERS ------------------------
-
-    @staticmethod
-    def get_by_id(faculty_id: str):
-        records = read_file(FAC_FILE)
-        rec = next((x for x in records if x["user_id"] == faculty_id), None)
-        if not rec:
+    # -----------------------------
+    # LOAD FACULTY (FACTORY METHOD)
+    # -----------------------------
+    @classmethod
+    def load(cls, repo_faculty, repo_student, repo_grades, repo_course, repo_notifications, repo_timetable, faculty_id):
+        user = repo_faculty.get_by_id(faculty_id)
+        if not user:
             return None
-        return FacultyModel(**rec)
 
-    # ------------------------ BUSINESS LOGIC ------------------------
+        return cls(
+            repo_faculty, repo_student, repo_grades, repo_course, repo_notifications, repo_timetable,
+            user_id=user["user_id"],
+            name=user["name"],
+            email=user["email"],
+            password=user["password"],
+            courses=user.get("courses", [])
+        )
+
+    # -----------------------------
+    # SAVE
+    # -----------------------------
+    def _save_self(self):
+        self.faculty_repo.save({
+            "user_id": self.user_id,
+            "name": self.name,
+            "email": self.email,
+            "password": self.password,
+            "courses": self.courses
+        })
+
+    # -----------------------------
+    # BUSINESS LOGIC
+    # -----------------------------
 
     def view_assigned_courses(self):
         return self.courses
 
-    def view_students_for_course(self, course_id: str):
-        students = read_file(STUDENTS_FILE)
-        enrolled = [s for s in students if course_id in s.get("enrolled", [])]
-        return enrolled
+    def view_students_for_course(self, course_id):
+        students = self.student_repo.get_all()
+        return [s for s in students if course_id in s.get("enrolled", [])]
 
-    def assign_grade(self, student_id: str, course_id: str, grade: str):
-        students = read_file(STUDENTS_FILE)
+    def assign_grade(self, student_id, course_id, grade):
+        students = self.student_repo.get_all()
         student = next((s for s in students if s["user_id"] == student_id), None)
-
         if not student:
             raise ValueError("Student not found")
 
         if course_id not in student.get("enrolled", []):
             raise ValueError("Student not enrolled in this course")
 
-        grades = read_file(GRADES_FILE)
+        grades = self.grades_repo.get_all()
         updated = False
 
         for g in grades:
@@ -62,18 +94,17 @@ class FacultyModel(UserModel):
                 "grade": grade
             })
 
-        write_file(GRADES_FILE, grades)
+        self.grades_repo.save_all(grades)
 
-    def send_notification(self, target: str, message: str):
-        notifs = read_file(NOTIF_FILE)
-        notifs.append({
+    def send_notification(self, target, message):
+        notes = self.notifications_repo.get_all()
+        notes.append({
             "to": target,
             "from": self.user_id,
             "message": message
         })
-        write_file(NOTIF_FILE, notifs)
+        self.notifications_repo.save_all(notes)
 
     def view_timetable(self):
-        tt = read_file(TIMETABLE_FILE)
-        mine = [x for x in tt if x.get("faculty_id") == self.user_id]
-        return mine
+        tt = self.timetable_repo.get_all()
+        return [t for t in tt if t.get("faculty_id") == self.user_id]
