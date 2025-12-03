@@ -42,7 +42,7 @@ def create_database():
         print(f"Error creating database: {e}")
         sys.exit(1)
 
-def create_schema():
+def create_schema(force_recreate=False):
     """Create all tables using schema.sql"""
     schema_path = os.path.join(os.path.dirname(__file__), "schema.sql")
     
@@ -52,6 +52,24 @@ def create_schema():
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
+            
+            # Check if tables already exist
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name IN ('admin', 'students', 'faculty', 'courses', 'grades')
+            """)
+            existing_tables = cursor.fetchone()[0]
+            
+            if existing_tables > 0 and not force_recreate:
+                print(f"  ⚠ Found {existing_tables} existing tables in database.")
+                response = input("  Do you want to DROP and recreate all tables? This will DELETE ALL DATA! (yes/no): ")
+                if response.lower() != 'yes':
+                    print("  ✓ Skipping schema creation. Using existing tables.")
+                    return
+                print("  ⚠ Dropping existing tables...")
+            
             cursor.execute(schema_sql)
             conn.commit()
             print("✓ Database schema created successfully")
@@ -59,7 +77,7 @@ def create_schema():
         print(f"Error creating schema: {e}")
         sys.exit(1)
 
-def migrate_data_from_files():
+def migrate_data_from_files(force_overwrite=False):
     """Optionally migrate existing data from JSON files to PostgreSQL"""
     data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
     
@@ -68,6 +86,27 @@ def migrate_data_from_files():
         return
     
     print("\n📦 Migrating data from files to PostgreSQL...")
+    
+    # Check if data already exists
+    if not force_overwrite:
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT COUNT(*) FROM admin")
+                admin_count = cursor.fetchone()[0]
+                cursor.execute("SELECT COUNT(*) FROM students")
+                student_count = cursor.fetchone()[0]
+                
+                if admin_count > 0 or student_count > 0:
+                    print(f"  ⚠ Found existing data in database ({admin_count} admins, {student_count} students).")
+                    response = input("  Do you want to overwrite existing data? (yes/no): ")
+                    if response.lower() != 'yes':
+                        print("  ✓ Skipping data migration. Keeping existing data.")
+                        return
+                    print("  ⚠ Overwriting existing data...")
+        except Exception as e:
+            # Tables might not exist yet, that's okay
+            pass
     
     # Import repositories
     from repositories.postgres_admin_repository import PostgresAdminRepository
@@ -112,11 +151,34 @@ def migrate_data_from_files():
                     data = json.load(f)
                 
                 repo = repos[repo_key]
+                
+                # For save_all/write_all methods, clear existing data first if overwriting
+                if (method == "save_all" or method == "write_all") and force_overwrite:
+                    # Clear existing data
+                    if repo_key == "grades":
+                        with get_db_connection() as conn:
+                            cursor = conn.cursor()
+                            cursor.execute("DELETE FROM grades")
+                    elif repo_key == "notifications":
+                        with get_db_connection() as conn:
+                            cursor = conn.cursor()
+                            cursor.execute("DELETE FROM notifications")
+                    elif repo_key == "timetable":
+                        with get_db_connection() as conn:
+                            cursor = conn.cursor()
+                            cursor.execute("DELETE FROM timetable")
+                
                 if method == "save_all" or method == "write_all":
                     getattr(repo, method)(data)
                 else:
                     for item in data:
-                        getattr(repo, method)(item)
+                        try:
+                            getattr(repo, method)(item)
+                        except ValueError as e:
+                            # Skip duplicates if not overwriting
+                            if "already exists" in str(e) and not force_overwrite:
+                                continue
+                            raise
                 
                 print(f"  ✓ Migrated {filename} ({len(data)} records)")
             except Exception as e:
@@ -142,6 +204,7 @@ def main():
     
     print("\n✅ Database initialization complete!")
     print("\nYou can now start your FastAPI application.")
+    print("\n💡 Tip: Running this script again will ask before dropping existing tables/data.")
 
 if __name__ == "__main__":
     main()
