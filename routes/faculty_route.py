@@ -3,24 +3,24 @@ from pydantic import BaseModel
 
 from models.faculty import FacultyModel
 
-from repositories.file_faculty_repository import FileFacultyRepository
-from repositories.file_student_repository import FileStudentRepository
-from repositories.file_grades_repository import FileGradesRepository
-from repositories.file_course_repository import FileCourseRepository
-from repositories.file_notifications_repository import FileNotificationsRepository
-from repositories.file_timetable_repository import FileTimetableRepository
+from repositories.postgres_faculty_repository import PostgresFacultyRepository
+from repositories.postgres_student_repository import PostgresStudentRepository
+from repositories.postgres_grades_repository import PostgresGradesRepository
+from repositories.postgres_course_repository import PostgresCourseRepository
+from repositories.postgres_notifications_repository import PostgresNotificationsRepository
+from repositories.postgres_timetable_repository import PostgresTimetableRepository
 
 router = APIRouter(prefix="/faculty", tags=["faculty"])
 
 # -----------------------
-# Repo Singletons
+# Repo Singletons - Using PostgreSQL repositories
 # -----------------------
-repo_faculty = FileFacultyRepository()
-repo_student = FileStudentRepository()
-repo_grades = FileGradesRepository()
-repo_course = FileCourseRepository()
-repo_notes = FileNotificationsRepository()
-repo_time = FileTimetableRepository()
+repo_faculty = PostgresFacultyRepository()
+repo_student = PostgresStudentRepository()
+repo_grades = PostgresGradesRepository()
+repo_course = PostgresCourseRepository()
+repo_notes = PostgresNotificationsRepository()
+repo_time = PostgresTimetableRepository()
 
 def load_faculty(fid):
     return FacultyModel.load(repo_faculty, repo_student, repo_grades, repo_course, repo_notes, repo_time, fid)
