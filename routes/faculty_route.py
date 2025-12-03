@@ -9,6 +9,7 @@ from repositories.postgres_grades_repository import PostgresGradesRepository
 from repositories.postgres_course_repository import PostgresCourseRepository
 from repositories.postgres_notifications_repository import PostgresNotificationsRepository
 from repositories.postgres_timetable_repository import PostgresTimetableRepository
+from repositories.postgres_attendance_repository import PostgresAttendanceRepository
 
 router = APIRouter(prefix="/faculty", tags=["faculty"])
 
@@ -21,9 +22,10 @@ repo_grades = PostgresGradesRepository()
 repo_course = PostgresCourseRepository()
 repo_notes = PostgresNotificationsRepository()
 repo_time = PostgresTimetableRepository()
+repo_attendance = PostgresAttendanceRepository()
 
 def load_faculty(fid):
-    return FacultyModel.load(repo_faculty, repo_student, repo_grades, repo_course, repo_notes, repo_time, fid)
+    return FacultyModel.load(repo_faculty, repo_student, repo_grades, repo_course, repo_notes, repo_time, repo_attendance, fid)
 
 # -----------------------
 # Request Models
@@ -39,6 +41,23 @@ class NotificationRequest(BaseModel):
     faculty_id: str
     target: str
     message: str
+
+class AttendanceRequest(BaseModel):
+    faculty_id: str
+    student_id: str
+    course_id: str
+    date: str  # Format: YYYY-MM-DD
+    status: str = "Present"  # Present, Absent, Late, Excused
+
+class AttendanceItem(BaseModel):
+    student_id: str
+    status: str = "Present"
+
+class BulkAttendanceRequest(BaseModel):
+    faculty_id: str
+    course_id: str
+    date: str  # Format: YYYY-MM-DD
+    attendance_list: list[AttendanceItem]  # List of {student_id, status}
 
 # -----------------------
 # Routes
@@ -95,3 +114,66 @@ def timetable(faculty_id: str):
     if not fac:
         raise HTTPException(404, "Faculty not found")
     return fac.view_timetable()
+
+@router.post("/mark-attendance")
+def mark_attendance(req: AttendanceRequest):
+    """
+    Mark attendance for a single student in a course.
+    """
+    fac = load_faculty(req.faculty_id)
+    if not fac:
+        raise HTTPException(404, "Faculty not found")
+    try:
+        fac.mark_attendance(req.student_id, req.course_id, req.date, req.status)
+        return {"status": "ok", "message": "Attendance marked successfully"}
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@router.post("/mark-attendance-bulk")
+def mark_attendance_bulk(req: BulkAttendanceRequest):
+    """
+    Mark attendance for multiple students in a course at once.
+    """
+    fac = load_faculty(req.faculty_id)
+    if not fac:
+        raise HTTPException(404, "Faculty not found")
+    
+    results = []
+    errors = []
+    
+    for attendance_item in req.attendance_list:
+        student_id = attendance_item.student_id
+        status = attendance_item.status
+        
+        try:
+            fac.mark_attendance(student_id, req.course_id, req.date, status)
+            results.append({"student_id": student_id, "status": "success"})
+        except ValueError as e:
+            errors.append({"student_id": student_id, "error": str(e)})
+    
+    return {
+        "status": "ok",
+        "message": f"Processed {len(req.attendance_list)} students",
+        "successful": len(results),
+        "failed": len(errors),
+        "results": results,
+        "errors": errors
+    }
+
+@router.get("/{faculty_id}/attendance/{course_id}/{date}")
+def get_attendance(faculty_id: str, course_id: str, date: str):
+    """
+    Get attendance records for all students in a course on a specific date.
+    """
+    fac = load_faculty(faculty_id)
+    if not fac:
+        raise HTTPException(404, "Faculty not found")
+    try:
+        attendance_records = fac.get_attendance_for_course_date(course_id, date)
+        return {
+            "course_id": course_id,
+            "date": date,
+            "attendance": attendance_records
+        }
+    except ValueError as e:
+        raise HTTPException(400, str(e))
