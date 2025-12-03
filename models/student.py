@@ -91,8 +91,8 @@ class StudentModel(UserModel):
         transcript = {}
 
         for g in student_grades:
-            year = str(g.get("year", "Unknown"))
-            transcript.setdefault(year, []).append({
+            semester = str(g.get("semester", "Unknown"))
+            transcript.setdefault(semester, []).append({
                 "course": g["course_id"],
                 "grade": g["grade"]
             })
