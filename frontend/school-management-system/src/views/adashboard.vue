@@ -4,10 +4,12 @@
     <p>Welcome, {{ userStore.username }}!</p>
 
     <div class="cards-container">
-      <router-link v-for="card in cards" 
-                   :key="card.title" 
-                   :to="card.link" 
-                   class="dashboard-card">
+      <router-link
+        v-for="card in cards"
+        :key="card.title"
+        :to="card.link"
+        class="dashboard-card"
+      >
         {{ card.title }}
       </router-link>
     </div>
@@ -15,10 +17,10 @@
 </template>
 
 <script setup>
-import { userRolestore } from '../store/rolestore'
-import { ref } from 'vue'
+import { userRolestore } from "../store/rolestore";
+import { ref } from "vue";
 
-const userStore = userRolestore()
+const userStore = userRolestore();
 
 // Define dashboard cards
 const cards = ref([
@@ -29,8 +31,8 @@ const cards = ref([
   { title: "ADD STUDENT", link: "/Aaddstudent" },
   { title: "ADD FACULTY", link: "/Aaddfaculty" },
   { title: "LIST USERS", link: "/Alistusers" },
-  { title: "GENERATE TIMETABLE", link: "/Ageneratetimetable" }
-])
+  { title: "GENERATE TIMETABLE", link: "/Ageneratetimetable" },
+]);
 </script>
 
 <style scoped>
@@ -40,7 +42,8 @@ const cards = ref([
   text-align: center;
   font-family: Arial, sans-serif;
   background: #f0f2f5;
-  min-height: 100vh;
+  min-height: auto;
+  overflow-y: hidden;
 }
 
 /* Heading */
@@ -79,13 +82,13 @@ const cards = ref([
   justify-content: center;
   align-items: center;
   height: 100px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Hover effect */
 .dashboard-card:hover {
   background-color: #2980b9;
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 </style>

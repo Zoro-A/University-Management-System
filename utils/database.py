@@ -20,7 +20,7 @@ DB_CONFIG = {
     "port": os.getenv("DB_PORT", "5432"),
     "database": os.getenv("DB_NAME", "university_db"),
     "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "postgres")
+    "password": os.getenv("DB_PASSWORD", "1122")
 }
 
 # Connection pool (optional, but recommended for better performance)

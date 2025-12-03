@@ -1,52 +1,71 @@
 <template>
   <div class="login-page">
-
     <div class="login-card">
       <h2>Login</h2>
 
       <input type="text" placeholder="Email" v-model="email" />
       <input type="password" placeholder="Password" v-model="password" />
 
-      <button class="login-button" @click="login">Login</button>
+      <button type="submit" class="login-button" @click="login">Login</button>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
-const store = userRolestore()
-const router = useRouter()
+const store = userRolestore();
+const router = useRouter();
 
-const email = ref('')
-const password = ref('')
+const email = ref("");
+const password = ref("");
 
 async function login() {
   try {
     const response = await axios.post("http://127.0.0.1:8000/auth/login", {
       email: email.value,
       password: password.value,
-      role: store.role
-    })
-
-    console.log("Login success:", response.data)
+      role: store.role,
+    });
 
     if (response.status === 200) {
-      store.setUser(response.data.user.user_id, response.data.user.name)
-      alert("Login Successful")
+      const user = response.data.user;
 
-      if (store.role === 'admin') router.push('/adashboard')
-      else if (store.role === 'student') router.push('/sdashboard')
-      else if (store.role === 'faculty') router.push('/fdashboard')
+      // Save data to store
+      store.setUser(user.user_id, user.name);
+
+      // Save login info as a single object in localStorage
+      const userData = {
+        name: user.name,
+        email: email.value,
+        role: store.role,
+        id: store.userid,
+      };
+      localStorage.setItem("userData", JSON.stringify(userData));
+
+      // Navigate based on role
+      if (store.role === "admin") router.push("/adashboard");
+      else if (store.role === "student") router.push("/sdashboard");
+      else if (store.role === "faculty") router.push("/fdashboard");
+
+      toast.success("Login Successful!", {
+        autoClose: 8000,
+        position: "top-right",
+        pauseOnHover: true,
+        closeOnClick: true,
+      });
     }
-
   } catch (error) {
-    console.error("Login failed:", error.response?.data || error.message)
-    alert("Login failed: " + (error.response?.data?.detail || error.message))
+    console.error("Login failed:", error.response?.data || error.message);
+    toast.error("Login failed. Please check your credentials.", {
+      autoClose: 5000,
+      position: "top-right",
+    });
   }
 }
 </script>
@@ -67,7 +86,7 @@ async function login() {
   padding: 25px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 15px;

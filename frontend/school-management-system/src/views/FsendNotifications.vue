@@ -1,168 +1,244 @@
 <template>
-  <div style="padding:20px">
+  <div style="padding: 20px">
     <h2>Send Notifications (Faculty)</h2>
 
     <div v-if="courses.length === 0">
       <p>Loading courses...</p>
     </div>
 
-    <div style="margin-top:12px">
+    <div style="margin-top: 12px">
       <label>Select Course:</label>
       <select v-model="selectedCourse">
         <option value="">-- Select course --</option>
         <option v-for="c in courses" :key="c" :value="c">{{ c }}</option>
       </select>
-      <button @click="loadStudentsForCourse" :disabled="!selectedCourse" style="margin-left:8px">Load Students</button>
+      <button
+        @click="loadStudentsForCourse"
+        :disabled="!selectedCourse"
+        style="margin-left: 8px"
+      >
+        Load Students
+      </button>
     </div>
 
-    <div v-if="loadingStudents" style="margin-top:10px">Loading students...</div>
+    <div v-if="loadingStudents" style="margin-top: 10px">
+      Loading students...
+    </div>
 
-    <div v-if="currentStudents.length" style="margin-top:14px">
+    <div v-if="currentStudents.length" style="margin-top: 14px">
       <h3>Students for {{ selectedCourse }}</h3>
 
-      <label><input type="checkbox" v-model="selectAll" @change="toggleSelectAll" /> Select All</label>
+      <label
+        ><input type="checkbox" v-model="selectAll" @change="toggleSelectAll" />
+        Select All</label
+      >
 
-      <div style="max-height:260px; overflow:auto; border:1px solid #eee; padding:8px; margin-top:8px; background:#fafafa">
-        <div v-for="s in currentStudents" :key="s.user_id" style="display:flex; align-items:center; gap:12px; padding:6px 0">
-          <input type="checkbox" :value="s.user_id" v-model="selectedRecipients" />
+      <div
+        style="
+          max-height: 260px;
+          overflow: auto;
+          border: 1px solid #eee;
+          padding: 8px;
+          margin-top: 8px;
+          background: #fafafa;
+        "
+      >
+        <div
+          v-for="s in currentStudents"
+          :key="s.user_id"
+          style="display: flex; align-items: center; gap: 12px; padding: 6px 0"
+        >
+          <input
+            type="checkbox"
+            :value="s.user_id"
+            v-model="selectedRecipients"
+          />
           <div>
-            <div><strong>{{ s.user_id }}</strong></div>
-            <div style="font-size:13px; color:#555">{{ s.name }} — {{ s.email }}</div>
+            <div>
+              <strong>{{ s.user_id }}</strong>
+            </div>
+            <div style="font-size: 13px; color: #555">
+              {{ s.name }} — {{ s.email }}
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="margin-top:10px">
-        <textarea v-model="message" rows="4" style="width:100%" placeholder="Enter notification message"></textarea>
+      <div style="margin-top: 10px">
+        <textarea
+          v-model="message"
+          rows="4"
+          style="width: 100%"
+          placeholder="Enter notification message"
+        ></textarea>
       </div>
 
-      <div style="margin-top:8px; display:flex; gap:8px">
-        <button @click="sendToSelected" :disabled="!message || selectedRecipients.length===0">Send to Selected</button>
+      <div style="margin-top: 8px; display: flex; gap: 8px">
+        <button
+          @click="sendToSelected"
+          :disabled="!message || selectedRecipients.length === 0"
+        >
+          Send to Selected
+        </button>
         <button @click="sendToAll" :disabled="!message">Send to All</button>
       </div>
 
-      <div v-if="result" style="margin-top:8px">{{ result }}</div>
+      <div v-if="result" style="margin-top: 8px">{{ result }}</div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+import { ref, reactive, onMounted, computed } from "vue";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
+const store = userRolestore();
 
-const courses = ref([])
-const studentsByCourse = reactive({})
-const selectedCourse = ref('')
-const loadingStudents = ref(false)
+const courses = ref([]);
+const studentsByCourse = reactive({});
+const selectedCourse = ref("");
+const loadingStudents = ref(false);
 
-const selectAll = ref(false)
-const selectedRecipients = ref([])
-const message = ref('')
-const result = ref('')
+const selectAll = ref(false);
+const selectedRecipients = ref([]);
+const message = ref("");
+const result = ref("");
 
 const currentStudents = computed(() => {
-  return selectedCourse.value && Array.isArray(studentsByCourse[selectedCourse.value]) ? studentsByCourse[selectedCourse.value] : []
-})
+  return selectedCourse.value &&
+    Array.isArray(studentsByCourse[selectedCourse.value])
+    ? studentsByCourse[selectedCourse.value]
+    : [];
+});
 
 async function fetchCourses() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
+  }
+
+  const userId = userData.id;
   try {
-    const fid = store.userid
-    if (!fid) {
-      console.warn('Faculty id missing in store')
-      courses.value = []
-      return
-    }
-    const res = await axios.get(`http://127.0.0.1:8000/faculty/${encodeURIComponent(fid)}/courses`)
-    courses.value = Array.isArray(res.data) ? res.data : []
+    const res = await axios.get(
+      `http://127.0.0.1:8000/faculty/${encodeURIComponent(userId)}/courses`
+    );
+    courses.value = Array.isArray(res.data) ? res.data : [];
   } catch (err) {
-    console.error('Failed to load courses', err)
-    courses.value = []
+    console.error("Failed to load courses", err);
+    courses.value = [];
   }
 }
 
 /* Extracted getstudents logic: fetch students per course and store in studentsByCourse */
 async function loadAllStudents() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
+  }
+
+  const userId = userData.id;
   try {
     for (const course of courses.value) {
       try {
-        const res = await axios.get(`http://127.0.0.1:8000/faculty/${encodeURIComponent(store.userid)}/students/${encodeURIComponent(course)}`)
-        studentsByCourse[course] = Array.isArray(res.data) ? res.data : []
+        const res = await axios.get(
+          `http://127.0.0.1:8000/faculty/${encodeURIComponent(
+            userId
+          )}/students/${encodeURIComponent(course)}`
+        );
+        studentsByCourse[course] = Array.isArray(res.data) ? res.data : [];
       } catch (err) {
-        console.error('Failed loading students for', course, err)
-        studentsByCourse[course] = []
+        console.error("Failed loading students for", course, err);
+        studentsByCourse[course] = [];
       }
     }
   } catch (err) {
-    console.error('Error in loadAllStudents', err)
+    console.error("Error in loadAllStudents", err);
   }
 }
 
 async function loadStudentsForCourse() {
-  if (!selectedCourse.value) return
-  loadingStudents.value = true
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
+  }
+
+  const userId = userData.id;
+  if (!selectedCourse.value) return;
+  loadingStudents.value = true;
   try {
     // if already loaded, just use from map
     if (!studentsByCourse[selectedCourse.value]) {
-      const res = await axios.get(`http://127.0.0.1:8000/faculty/${encodeURIComponent(store.userid)}/students/${encodeURIComponent(selectedCourse.value)}`)
-      studentsByCourse[selectedCourse.value] = Array.isArray(res.data) ? res.data : []
+      const res = await axios.get(
+        `http://127.0.0.1:8000/faculty/${encodeURIComponent(
+          userId
+        )}/students/${encodeURIComponent(selectedCourse.value)}`
+      );
+      studentsByCourse[selectedCourse.value] = Array.isArray(res.data)
+        ? res.data
+        : [];
     }
     // reset selections
-    selectedRecipients.value = []
-    selectAll.value = false
-    result.value = ''
+    selectedRecipients.value = [];
+    selectAll.value = false;
+    result.value = "";
   } catch (err) {
-    console.error('Failed loading students for course', err)
-    studentsByCourse[selectedCourse.value] = []
+    console.error("Failed loading students for course", err);
+    studentsByCourse[selectedCourse.value] = [];
   } finally {
-    loadingStudents.value = false
+    loadingStudents.value = false;
   }
 }
 
 function toggleSelectAll() {
-  if (selectAll.value) selectedRecipients.value = currentStudents.value.map(s => s.user_id)
-  else selectedRecipients.value = []
+  if (selectAll.value)
+    selectedRecipients.value = currentStudents.value.map((s) => s.user_id);
+  else selectedRecipients.value = [];
 }
 
 async function sendToSelected() {
-  if (!message.value || selectedRecipients.value.length === 0) return
-  result.value = 'Sending...'
+  if (!message.value || selectedRecipients.value.length === 0) return;
+  result.value = "Sending...";
   try {
-    const fid = store.userid
-    const tasks = selectedRecipients.value.map(id => {
-      const payload = { faculty_id: fid, target: id, message: message.value }
-      return axios.post('http://127.0.0.1:8000/faculty/notify', payload)
-    })
-    const settled = await Promise.allSettled(tasks)
-    const failed = settled.filter(s => s.status === 'rejected')
-    result.value = failed.length === 0 ? 'Notifications sent successfully.' : `${settled.length - failed.length} sent, ${failed.length} failed.`
+    const fid = store.userid;
+    const tasks = selectedRecipients.value.map((id) => {
+      const payload = { faculty_id: fid, target: id, message: message.value };
+      return axios.post("http://127.0.0.1:8000/faculty/notify", payload);
+    });
+    const settled = await Promise.allSettled(tasks);
+    const failed = settled.filter((s) => s.status === "rejected");
+    result.value =
+      failed.length === 0
+        ? "Notifications sent successfully."
+        : `${settled.length - failed.length} sent, ${failed.length} failed.`;
   } catch (err) {
-    console.error('Send selected error', err)
-    result.value = 'Failed to send notifications.'
+    console.error("Send selected error", err);
+    result.value = "Failed to send notifications.";
   }
 }
 
 async function sendToAll() {
-  if (!message.value) return
-  result.value = 'Sending to all...'
+  if (!message.value) return;
+  result.value = "Sending to all...";
   try {
-    const fid = store.userid
-    const payload = { faculty_id: fid, target: 'all', message: message.value }
-    await axios.post('http://127.0.0.1:8000/faculty/notify', payload)
-    result.value = 'Notification sent to all.'
+    const fid = store.userid;
+    const payload = { faculty_id: fid, target: "all", message: message.value };
+    await axios.post("http://127.0.0.1:8000/faculty/notify", payload);
+    result.value = "Notification sent to all.";
   } catch (err) {
-    console.error('Send to all error', err)
-    result.value = 'Failed to send to all.'
+    console.error("Send to all error", err);
+    result.value = "Failed to send to all.";
   }
 }
 
 onMounted(async () => {
-  await fetchCourses()
+  await fetchCourses();
   // optionally pre-load students for faster selection
   // await loadAllStudents()
-})
+});
 </script>
 
 <style scoped>

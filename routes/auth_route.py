@@ -12,7 +12,6 @@ class LoginRequest(BaseModel):
     password: str
     role: str  # "student", "admin", "faculty"
 
-# Repository instances
 repo_student = PostgresStudentRepository()
 repo_admin = PostgresAdminRepository()
 repo_faculty = PostgresFacultyRepository()
@@ -25,33 +24,34 @@ ROLE_REPO_MAP = {
 
 @router.post("/login")
 def login(payload: LoginRequest):
-    role = payload.role.lower()
+    try:
+        role = payload.role.lower()
 
-    if role not in ROLE_REPO_MAP:
-        raise HTTPException(status_code=400, detail="Invalid role")
+        if role not in ROLE_REPO_MAP:
+            raise HTTPException(status_code=400, detail="Invalid role")
 
-    # Get the appropriate repository
-    repo = ROLE_REPO_MAP[role]
-    
-    # Get all users from the repository
-    users = repo.get_all()
+        repo = ROLE_REPO_MAP[role]
 
-    # Search user
-    user = next((
-        u for u in users
-        if u.get("email") == payload.email and u.get("password") == payload.password
-    ), None)
+        users = repo.get_all()
 
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        user = next((
+            u for u in users
+            if u.get("email") == payload.email and u.get("password") == payload.password
+        ), None)
 
-    # Successful login
-    return {
-        "status": "ok",
-        "role": role,
-        "user": {
-            "user_id": user["user_id"],
-            "name": user.get("name"),
-            "email": user.get("email")
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        return {
+            "status": "ok",
+            "role": role,
+            "user": {
+                "user_id": user["user_id"],
+                "name": user.get("name"),
+                "email": user.get("email")
+            }
         }
-    }
+
+    except Exception as e:
+        print("🔥 LOGIN API CRASH ERROR:", str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")

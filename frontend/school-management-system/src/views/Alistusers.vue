@@ -3,7 +3,6 @@
     <h1>All Users</h1>
 
     <div v-for="(group, role) in users" :key="role" class="role-section">
-
       <h2>{{ role.toUpperCase() }}</h2>
 
       <table :class="['users-table', role]">
@@ -25,36 +24,38 @@
           </tr>
         </tbody>
       </table>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
-const users = ref({})
+const store = userRolestore();
+const users = ref({});
 
 async function fetchUsers() {
-  if (!store.userid) {
-    console.error("Admin ID missing")
-    return
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
   }
+
+  const userId = userData.id;
 
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8000/admin/${store.userid}/users`
-    )
-    users.value = response.data
+      `http://127.0.0.1:8000/admin/${userId}/users`
+    );
+    users.value = response.data;
   } catch (error) {
-    console.error("Failed to fetch users:", error.response?.data || error)
+    console.error("Failed to fetch users:", error.response?.data || error);
   }
 }
 
-onMounted(fetchUsers)
+onMounted(fetchUsers);
 </script>
 
 <style scoped>
@@ -79,10 +80,11 @@ h1 {
   border-collapse: collapse;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.users-table th, .users-table td {
+.users-table th,
+.users-table td {
   padding: 12px;
   text-align: left;
   border: none;

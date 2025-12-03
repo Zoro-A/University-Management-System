@@ -1,6 +1,5 @@
 <template>
-  <div style="padding:20px">
-
+  <div style="padding: 20px">
     <h2>Assign Grades</h2>
 
     <div v-if="courses.length === 0">
@@ -8,12 +7,14 @@
     </div>
 
     <!-- COURSE TABLES -->
-    <div v-for="(course, index) in courses" :key="course" style="margin-bottom:40px">
-
+    <div
+      v-for="(course, index) in courses"
+      :key="course"
+      style="margin-bottom: 40px"
+    >
       <h3>Course: {{ course }}</h3>
 
       <table border="1" cellpadding="8" cellspacing="0" width="100%">
-
         <thead>
           <tr>
             <th>Student ID</th>
@@ -25,9 +26,7 @@
         </thead>
 
         <tbody>
-
           <tr v-for="student in students[index]" :key="student.user_id">
-
             <td>{{ student.user_id }}</td>
             <td>{{ student.name }}</td>
 
@@ -53,127 +52,124 @@
                 Save
               </button>
             </td>
-
           </tr>
-
         </tbody>
       </table>
-
     </div>
-
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
 
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+const store = userRolestore();
 
-const store = userRolestore()
+const courses = ref([]);
+const students = ref([]);
 
-const courses = ref([])
-const students = ref([])
+const marks = ref({});
+const grades = ref({});
 
-const marks = ref({})
-const grades = ref({})
-
-
-/* -----------------------------------
-   FETCH COURSES
------------------------------------ */
 async function fetchCourses() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
+  }
+
+  const userId = userData.id;
+
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/faculty/${store.userid}/courses`)
-    courses.value = response.data
+    const response = await axios.get(
+      `http://127.0.0.1:8000/faculty/${userId}/courses`
+    );
+    courses.value = response.data;
   } catch (err) {
-    console.error("Failed to load courses", err)
+    console.error("Failed to load courses", err);
   }
 }
 
-
-/* -----------------------------------
-   FETCH STUDENTS
------------------------------------ */
 async function getstudents() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
+  }
+
+  const userId = userData.id;
   try {
-    students.value = []
+    students.value = [];
 
     for (const course of courses.value) {
-
-      const response = await axios.get(`http://127.0.0.1:8000/faculty/${store.userid}/students/${course}`)
-      students.value.push(response.data)
+      const response = await axios.get(
+        `http://127.0.0.1:8000/faculty/${userId}/students/${course}`
+      );
+      students.value.push(response.data);
 
       // Initialize per course grade maps
-      marks.value[course] = {}
-      grades.value[course] = {}
+      marks.value[course] = {};
+      grades.value[course] = {};
     }
-
   } catch (err) {
-    console.error("Failed loading students", err)
+    console.error("Failed loading students", err);
   }
 }
-
 
 /* -----------------------------------
    AUTO GRADE CALCULATION
 ----------------------------------- */
 function calculateGrade(course_id, student_id) {
-
-  const score = marks.value[course_id][student_id]
+  const score = marks.value[course_id][student_id];
 
   if (score === undefined || score === "") {
-    grades.value[course_id][student_id] = ""
-    return
+    grades.value[course_id][student_id] = "";
+    return;
   }
 
-  if (score >= 85) grades.value[course_id][student_id] = "A"
-  else if (score >= 70) grades.value[course_id][student_id] = "B"
-  else if (score >= 60) grades.value[course_id][student_id] = "C"
-  else if (score >= 50) grades.value[course_id][student_id] = "D"
-  else grades.value[course_id][student_id] = "F"
+  if (score >= 85) grades.value[course_id][student_id] = "A";
+  else if (score >= 70) grades.value[course_id][student_id] = "B";
+  else if (score >= 60) grades.value[course_id][student_id] = "C";
+  else if (score >= 50) grades.value[course_id][student_id] = "D";
+  else grades.value[course_id][student_id] = "F";
 }
-
 
 /* -----------------------------------
    POST GRADE TO BACKEND
 ----------------------------------- */
 async function submitGrade(course_id, student_id) {
-
-  const grade = grades.value[course_id][student_id]
+  const grade = grades.value[course_id][student_id];
 
   const payload = {
     faculty_id: store.userid,
     student_id: student_id,
     course_id: course_id,
-    grade: grade
-  }
+    grade: grade,
+  };
 
   try {
     const response = await axios.post(
       "http://127.0.0.1:8000/faculty/assign-grade",
       payload
-    )
+    );
 
     if (response.status === 200) {
-      alert(`Grade saved for ${student_id} in ${course_id}`)
+      alert(`Grade saved for ${student_id} in ${course_id}`);
     }
-
   } catch (err) {
-    console.error(err)
-    alert("Failed to assign grade")
+    console.error(err);
+    alert("Failed to assign grade");
   }
 }
-
 
 /* -----------------------------------
    LOAD DATA
 ----------------------------------- */
 onMounted(async () => {
-  await fetchCourses()
-  await getstudents()
-})
-
+  await fetchCourses();
+  await getstudents();
+});
 </script>
 
 <style scoped>
@@ -336,5 +332,4 @@ p {
   color: #7f8c8d;
   font-size: 15px;
 }
-
 </style>
