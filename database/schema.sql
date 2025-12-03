@@ -2,6 +2,7 @@
 -- PostgreSQL Database Schema
 
 -- Drop tables if they exist (for clean setup)
+DROP TABLE IF EXISTS attendance CASCADE;
 DROP TABLE IF EXISTS timetable CASCADE;
 DROP TABLE IF EXISTS notifications CASCADE;
 DROP TABLE IF EXISTS grades CASCADE;
@@ -70,7 +71,7 @@ CREATE TABLE grades (
     student_id VARCHAR(50) REFERENCES students(user_id) ON DELETE CASCADE,
     course_id VARCHAR(50) REFERENCES courses(course_id) ON DELETE CASCADE,
     grade VARCHAR(10) NOT NULL,
-    year INTEGER,
+    semester VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(student_id, course_id)
@@ -99,6 +100,19 @@ CREATE TABLE timetable (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Attendance table
+CREATE TABLE attendance (
+    id SERIAL PRIMARY KEY,
+    student_id VARCHAR(50) REFERENCES students(user_id) ON DELETE CASCADE,
+    course_id VARCHAR(50) REFERENCES courses(course_id) ON DELETE CASCADE,
+    faculty_id VARCHAR(50) REFERENCES faculty(user_id) ON DELETE SET NULL,
+    date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Present',  -- Present, Absent, Late, Excused
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(student_id, course_id, date)
+);
+
 -- Create indexes for better query performance
 CREATE INDEX idx_student_courses_student ON student_courses(student_id);
 CREATE INDEX idx_student_courses_course ON student_courses(course_id);
@@ -109,4 +123,8 @@ CREATE INDEX idx_grades_course ON grades(course_id);
 CREATE INDEX idx_notifications_receiver ON notifications(receiver);
 CREATE INDEX idx_timetable_course ON timetable(course_id);
 CREATE INDEX idx_timetable_faculty ON timetable(faculty_id);
+CREATE INDEX idx_attendance_student ON attendance(student_id);
+CREATE INDEX idx_attendance_course ON attendance(course_id);
+CREATE INDEX idx_attendance_faculty ON attendance(faculty_id);
+CREATE INDEX idx_attendance_date ON attendance(date);
 
