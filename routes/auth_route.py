@@ -1,7 +1,9 @@
 # backend/routers/auth.py
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from utils.file_manager import read_file
+from repositories.postgres_student_repository import PostgresStudentRepository
+from repositories.postgres_admin_repository import PostgresAdminRepository
+from repositories.postgres_faculty_repository import PostgresFacultyRepository
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -10,22 +12,29 @@ class LoginRequest(BaseModel):
     password: str
     role: str  # "student", "admin", "faculty"
 
+# Repository instances
+repo_student = PostgresStudentRepository()
+repo_admin = PostgresAdminRepository()
+repo_faculty = PostgresFacultyRepository()
 
-ROLE_FILE_MAP = {
-    "student": "students.txt",
-    "admin": "admin.txt",
-    "faculty": "faculty.txt"
+ROLE_REPO_MAP = {
+    "student": repo_student,
+    "admin": repo_admin,
+    "faculty": repo_faculty
 }
 
 @router.post("/login")
 def login(payload: LoginRequest):
     role = payload.role.lower()
 
-    if role not in ROLE_FILE_MAP:
+    if role not in ROLE_REPO_MAP:
         raise HTTPException(status_code=400, detail="Invalid role")
 
-    # Load only the relevant file
-    users = read_file(ROLE_FILE_MAP[role])
+    # Get the appropriate repository
+    repo = ROLE_REPO_MAP[role]
+    
+    # Get all users from the repository
+    users = repo.get_all()
 
     # Search user
     user = next((
