@@ -11,7 +11,6 @@
     </div>
 
     <div v-for="(course, idx) in courses" :key="course" class="course-card">
-      
       <div class="course-header">
         <div class="course-title-group">
           <span class="badge">Course</span>
@@ -19,7 +18,11 @@
         </div>
         <div class="date-control">
           <label>Select Date:</label>
-          <input type="date" v-model="selectedDate[course]" class="form-input" />
+          <input
+            type="date"
+            v-model="selectedDate[course]"
+            class="form-input"
+          />
         </div>
       </div>
 
@@ -40,143 +43,179 @@
               <td class="name-cell">{{ student.name }}</td>
               <td>
                 <div class="select-wrapper">
-                  <select v-model="attendance[course][student.user_id]" 
-                          :class="attendance[course][student.user_id] === 'Absent' ? 'status-absent' : 'status-present'">
+                  <select
+                    v-model="attendance[course][student.user_id]"
+                    :class="
+                      attendance[course][student.user_id] === 'Absent'
+                        ? 'status-absent'
+                        : 'status-present'
+                    "
+                  >
                     <option value="Present">Present</option>
                     <option value="Absent">Absent</option>
                   </select>
                 </div>
               </td>
               <td class="text-right">
-                <button class="btn-primary" @click="markAttendance(course, student.user_id, student.name)">
+                <button
+                  class="btn-primary"
+                  @click="markAttendance(course, student.user_id, student.name)"
+                >
                   Save
                 </button>
               </td>
             </tr>
           </tbody>
 
-          <tfoot v-if="attendanceLogs[course] && attendanceLogs[course].length > 0">
+          <tfoot
+            v-if="attendanceLogs[course] && attendanceLogs[course].length > 0"
+          >
             <tr class="log-header-row">
               <td colspan="4">Recent Activity (Today)</td>
             </tr>
-            <tr v-for="(log, i) in attendanceLogs[course]" :key="log.date + log.student_id + i" class="log-row">
+            <tr
+              v-for="(log, i) in attendanceLogs[course]"
+              :key="log.date + log.student_id + i"
+              class="log-row"
+            >
               <td>#{{ log.student_id }}</td>
               <td>{{ log.name }}</td>
               <td>
-                <span :class="['status-pill', log.status.toLowerCase()]">{{ log.status }}</span>
+                <span :class="['status-pill', log.status.toLowerCase()]">{{
+                  log.status
+                }}</span>
               </td>
               <td class="text-right date-cell">{{ log.date }}</td>
             </tr>
           </tfoot>
         </table>
-        
-        <div v-if="!attendanceLogs[course] || attendanceLogs[course].length === 0" class="empty-logs">
-           No attendance marked for this session yet.
+
+        <div
+          v-if="!attendanceLogs[course] || attendanceLogs[course].length === 0"
+          class="empty-logs"
+        >
+          No attendance marked for this session yet.
         </div>
       </div>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
+const store = userRolestore();
 
-const courses = ref([])
-const students = ref([]) // array of arrays; students per course index
+const courses = ref([]);
+const students = ref([]); // array of arrays; students per course index
 
-const attendance = ref({}) // attendance[course][studentId] => 'Present'|'Absent'
-const attendanceLogs = ref({}) // attendanceLogs[course] => array of logs
-const selectedDate = ref({}) // selectedDate[course] => 'YYYY-MM-DD'
+const attendance = ref({}); // attendance[course][studentId] => 'Present'|'Absent'
+const attendanceLogs = ref({}); // attendanceLogs[course] => array of logs
+const selectedDate = ref({}); // selectedDate[course] => 'YYYY-MM-DD'
 
-async function fetchCourses(){
-	const userData = JSON.parse(localStorage.getItem('userData'))
-	if(!userData || !userData.id) return
-	const userId = userData.id
-	try{
-		const resp = await axios.get(`http://127.0.0.1:8001/faculty/${userId}/courses`)
-		courses.value = resp.data
-	}catch(err){
-		console.error('Failed to load courses', err)
-	}
+async function fetchCourses() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  if (!userData || !userData.id) return;
+  const userId = userData.id;
+  try {
+    const resp = await axios.get(
+      `http://127.0.0.1:8000/faculty/${userId}/courses`
+    );
+    courses.value = resp.data;
+  } catch (err) {
+    console.error("Failed to load courses", err);
+  }
 }
 
-async function getstudents(){
-	const userData = JSON.parse(localStorage.getItem('userData'))
-	if(!userData || !userData.id) return
-	const userId = userData.id
-	try{
-		students.value = []
-		// initialize maps
-		for(const course of courses.value){
-			const resp = await axios.get(`http://127.0.0.1:8001/faculty/${userId}/students/${course}`)
-			students.value.push(resp.data)
+async function getstudents() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  if (!userData || !userData.id) return;
+  const userId = userData.id;
+  try {
+    students.value = [];
+    // initialize maps
+    for (const course of courses.value) {
+      const resp = await axios.get(
+        `http://127.0.0.1:8000/faculty/${userId}/students/${course}`
+      );
+      students.value.push(resp.data);
 
-			attendance.value[course] = {}
-			attendanceLogs.value[course] = []
-			selectedDate.value[course] = formatDateISO()
+      attendance.value[course] = {};
+      attendanceLogs.value[course] = [];
+      selectedDate.value[course] = formatDateISO();
 
-			// default attendance selection to Present for each student
-			for(const s of resp.data){
-				attendance.value[course][s.user_id] = 'Present'
-			}
-		}
-	}catch(err){
-		console.error('Failed loading students', err)
-	}
+      // default attendance selection to Present for each student
+      for (const s of resp.data) {
+        attendance.value[course][s.user_id] = "Present";
+      }
+    }
+  } catch (err) {
+    console.error("Failed loading students", err);
+  }
 }
 
-function formatDateISO(d = new Date()){
-	const yyyy = d.getFullYear()
-	const mm = String(d.getMonth()+1).padStart(2,'0')
-	const dd = String(d.getDate()).padStart(2,'0')
-	return `${yyyy}-${mm}-${dd}`
+function formatDateISO(d = new Date()) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
-async function markAttendance(course_id, student_id, student_name){
-	const status = attendance.value[course_id][student_id] || 'Present'
-	const date = selectedDate.value[course_id] || formatDateISO()
+async function markAttendance(course_id, student_id, student_name) {
+  const status = attendance.value[course_id][student_id] || "Present";
+  const date = selectedDate.value[course_id] || formatDateISO();
 
-	// prevent duplicate marking for same student & date
-	if(Array.isArray(attendanceLogs.value[course_id])){
-		const exists = attendanceLogs.value[course_id].some(l => l.student_id === student_id && l.date === date)
-		if(exists){
-			alert('Attendance already marked for this student on the selected date.')
-			return
-		}
-	}
+  if (Array.isArray(attendanceLogs.value[course_id])) {
+    const exists = attendanceLogs.value[course_id].some(
+      (l) => l.student_id === student_id && l.date === date
+    );
+    if (exists) {
+      alert("Attendance already marked for this student on the selected date.");
+      return;
+    }
+  }
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
-	const payload = {
-		faculty_id: store.userid,
-		student_id: student_id,
-		course_id: course_id,
-		date: date,
-		status: status
-	}
+  if (!userData || !userData.id) {
+    console.error("User not logged in");
+    return;
+  }
 
-	try{
-		const resp = await axios.post('http://127.0.0.1:8001/faculty/mark-attendance', payload)
-		if(resp.status === 200 || resp.status === 201){
-			// append to logs for this course — new entries appear as last rows (tfoot)
-			attendanceLogs.value[course_id].push({
-				student_id: student_id,
-				name: student_name,
-				status: status,
-				date: payload.date
-			})
-		}
-	}catch(err){
-		console.error('Failed to mark attendance', err)
-		alert('Failed to mark attendance')
-	}
+  const userId = userData.id;
+
+  const payload = {
+    faculty_id: userId,
+    student_id: student_id,
+    course_id: course_id,
+    date: date,
+    status: status,
+  };
+
+  try {
+    const resp = await axios.post(
+      "http://127.0.0.1:8000/faculty/mark-attendance",
+      payload
+    );
+    if (resp.status === 200 || resp.status === 201) {
+      // append to logs for this course — new entries appear as last rows (tfoot)
+      attendanceLogs.value[course_id].push({
+        student_id: student_id,
+        name: student_name,
+        status: status,
+        date: payload.date,
+      });
+    }
+  } catch (err) {
+    console.error("Failed to mark attendance", err);
+    alert("Failed to mark attendance");
+  }
 }
 
-onMounted(async ()=>{
-	await fetchCourses()
-	await getstudents()
-})
+onMounted(async () => {
+  await fetchCourses();
+  await getstudents();
+});
 </script>
 <style scoped>
 /* --- Layout & Typography --- */
@@ -184,7 +223,8 @@ onMounted(async ()=>{
   max-width: 1000px;
   margin: 0 auto;
   padding: 40px 20px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
   color: #1f2937;
   background-color: #f9fafb;
   min-height: 100vh;
@@ -211,7 +251,8 @@ onMounted(async ()=>{
 .course-card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   margin-bottom: 40px;
   overflow: hidden;
   border: 1px solid #e5e7eb;
@@ -460,8 +501,12 @@ tfoot {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile Responsive */
@@ -470,7 +515,7 @@ tfoot {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .date-control {
     width: 100%;
     justify-content: space-between;
