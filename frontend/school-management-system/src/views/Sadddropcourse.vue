@@ -18,9 +18,9 @@
         <tbody>
           <tr v-for="c in courses" :key="c.course_id">
             <td>{{ c.course_id }}</td>
-            <td>{{ c.course_name || '-' }}</td>
-            <td>{{ c.credits ?? '-' }}</td>
-            <td>{{ c.prerequisite || c.prerequisites || '-' }}</td>
+            <td>{{ c.course_name || "-" }}</td>
+            <td>{{ c.credits ?? "-" }}</td>
+            <td>{{ c.prerequisite || c.prerequisites || "-" }}</td>
             <td class="actions-btns">
               <button @click="enrollCourse(c.course_id)">Add</button>
               <button @click="dropCourse(c.course_id)">Drop</button>
@@ -29,69 +29,91 @@
         </tbody>
       </table>
     </section>
-
-    <!-- Professional Notification Block -->
-    <div v-if="statusMsg" class="status-box">
-      {{ statusMsg }}
-    </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
-const ADMIN_ID = 'A1'
-const courses = ref([])
+const ADMIN_ID = "A1";
+const courses = ref([]);
 
-const statusMsg = ref('')
-const STUDENT_ID = ref('S1')
+const statusMsg = ref("");
+const STUDENT_ID = ref("S1");
 
 async function fetchCourses() {
   try {
-    const res = await axios.get(`http://127.0.0.1:8001/admin/${encodeURIComponent(ADMIN_ID)}/courses`)
-    courses.value = Array.isArray(res.data) ? res.data : []
+    const res = await axios.get(
+      `http://127.0.0.1:8000/admin/${encodeURIComponent(ADMIN_ID)}/courses`
+    );
+    courses.value = Array.isArray(res.data) ? res.data : [];
   } catch (err) {
-    courses.value = []
+    courses.value = [];
   }
 }
 
 async function enrollCourse(courseId) {
   if (!STUDENT_ID.value) {
-    statusMsg.value = 'Student ID is required'
-    return
+    statusMsg.value = "Student ID is required";
+    return;
   }
-  statusMsg.value = 'Sending enrollment request...'
+  statusMsg.value = "Sending enrollment request...";
 
   try {
-    await axios.post('http://127.0.0.1:8001/student/enroll', {
+    await axios.post("http://127.0.0.1:8000/student/enroll", {
       student_id: STUDENT_ID.value,
-      course_id: courseId
-    })
-    statusMsg.value = `✅ ${STUDENT_ID.value} enrolled in ${courseId}`
+      course_id: courseId,
+    });
+    statusMsg.value = `✅ ${STUDENT_ID.value} enrolled in ${courseId}`;
+    toast.success("Course Enrolled Successfully!", {
+      autoClose: 3000,
+      position: "top-right",
+      pauseOnHover: true,
+      closeOnClick: true,
+    });
   } catch {
-    statusMsg.value = `❌ Failed to enroll in ${courseId}`
+    toast.error("Already Enrolled In This Course!", {
+      autoClose: 3000,
+      position: "top-right",
+      pauseOnHover: true,
+      closeOnClick: true,
+    });
+    statusMsg.value = `❌ Failed to enroll in ${courseId}`;
   }
 }
 
 async function dropCourse(courseId) {
-  if (!STUDENT_ID.value) return (statusMsg.value = 'Student ID is required')
+  if (!STUDENT_ID.value) return (statusMsg.value = "Student ID is required");
 
-  statusMsg.value = 'Sending drop request...'
+  statusMsg.value = "Sending drop request...";
 
   try {
-    await axios.post('http://127.0.0.1:8001/student/drop', {
+    await axios.post("http://127.0.0.1:8000/student/drop", {
       student_id: STUDENT_ID.value,
-      course_id: courseId
-    })
-    statusMsg.value = `✅ ${STUDENT_ID.value} dropped ${courseId}`
+      course_id: courseId,
+    });
+    statusMsg.value = `✅ ${STUDENT_ID.value} dropped ${courseId}`;
+    toast.success("Course Dropped Successfully!", {
+      autoClose: 3000,
+      position: "top-right",
+      pauseOnHover: true,
+      closeOnClick: true,
+    });
   } catch {
-    statusMsg.value = `❌ Failed to drop ${courseId}`
+    toast.error("Can Not Drop Course", {
+      autoClose: 3000,
+      position: "top-right",
+      pauseOnHover: true,
+      closeOnClick: true,
+    });
+    statusMsg.value = `❌ Failed to drop ${courseId}`;
   }
 }
 
-onMounted(fetchCourses)
+onMounted(fetchCourses);
 </script>
 
 <style scoped>
@@ -145,7 +167,8 @@ thead {
   color: white;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   text-align: left;
   font-size: 15px;
@@ -202,14 +225,20 @@ tbody tr:hover {
   background: #e6eeff;
   color: #2c3e70;
   border-left: 6px solid #4a6cf7;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   font-size: 15px;
   animation: slideUp 0.35s ease;
 }
 
 /* Animation for notification */
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

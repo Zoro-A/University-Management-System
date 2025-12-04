@@ -20,50 +20,52 @@
         <tr v-for="(item, idx) in timetable" :key="idx">
           <td>{{ item.day }}</td>
           <td>{{ item.course_id }}</td>
-          <td>{{ item.course_name || '-' }}</td>
-          <td>{{ item.slot || '-' }}</td>
-          <td>{{ item.room || '-' }}</td>
-          <td>{{ item.faculty_name || item.faculty_id || '-' }}</td>
+          <td>{{ item.course_name || "-" }}</td>
+          <td>{{ item.slot || "-" }}</td>
+          <td>{{ item.room || "-" }}</td>
+          <td>{{ item.faculty_name || item.faculty_id || "-" }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
-const timetable = ref([])
-const loading = ref(false)
+const store = userRolestore();
+const timetable = ref([]);
+const loading = ref(false);
 
 async function fetchTimetable() {
-  const sid = store.userid
-  if (!sid) {
-    // no student id in store; keep empty or you can set sample data
-    timetable.value = []
-    return
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
   }
 
-  loading.value = true
+  const userId = userData.id;
+
+  loading.value = true;
   try {
-    const url = `http://127.0.0.1:8001/student/${encodeURIComponent(sid)}/timetable`
-    const res = await axios.get(url)
-    timetable.value = Array.isArray(res.data) ? res.data : []
+    const url = `http://127.0.0.1:8000/student/${encodeURIComponent(
+      userId
+    )}/timetable`;
+    const res = await axios.get(url);
+    timetable.value = Array.isArray(res.data) ? res.data : [];
   } catch (err) {
-    console.error('Failed to fetch timetable', err.response?.data || err)
-    timetable.value = []
+    console.error("Failed to fetch timetable", err.response?.data || err);
+    timetable.value = [];
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 onMounted(() => {
-  fetchTimetable()
-})
+  fetchTimetable();
+});
 </script>
 
 <style scoped>
@@ -128,8 +130,12 @@ h1 {
   background: #6c7bf3;
   margin-right: 6px;
 }
-.badge.room { background: #4a90e2 }
-.badge.slot { background: #7f57ff }
+.badge.room {
+  background: #4a90e2;
+}
+.badge.slot {
+  background: #7f57ff;
+}
 
 /* Row striping */
 .tt-table tbody tr:nth-child(even) {
@@ -156,17 +162,50 @@ h1 {
 
 /* Smooth Fade Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive adjustments */
 @media (max-width: 800px) {
-  .tt-table th, .tt-table td { padding: 10px; font-size: 13px }
-  .tt-table thead { display: none }
-  .tt-table, .tt-table tbody, .tt-table tr, .tt-table td { display: block; width: 100% }
-  .tt-table tr { margin-bottom: 12px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04) }
-  .tt-table td { text-align: left; padding-left: 14px; position: relative }
-  .tt-table td::before { content: attr(data-label); font-weight: 600; display: block; color:#6b7280; margin-bottom:6px }
+  .tt-table th,
+  .tt-table td {
+    padding: 10px;
+    font-size: 13px;
+  }
+  .tt-table thead {
+    display: none;
+  }
+  .tt-table,
+  .tt-table tbody,
+  .tt-table tr,
+  .tt-table td {
+    display: block;
+    width: 100%;
+  }
+  .tt-table tr {
+    margin-bottom: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .tt-table td {
+    text-align: left;
+    padding-left: 14px;
+    position: relative;
+  }
+  .tt-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    display: block;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
 }
 </style>

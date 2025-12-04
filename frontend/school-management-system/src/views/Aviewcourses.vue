@@ -16,8 +16,14 @@
           <td>{{ course.course_id }}</td>
           <td>{{ course.course_name }}</td>
           <td>{{ course.credits }}</td>
-          <td>{{ course.prerequisite || course.prerequisites || '-' }}</td>
-          <td>{{ course.eligible_faculty.length ? course.eligible_faculty.join(', ') : '-' }}</td>
+          <td>{{ course.prerequisite || course.prerequisites || "-" }}</td>
+          <td>
+            {{
+              course.eligible_faculty.length
+                ? course.eligible_faculty.join(", ")
+                : "-"
+            }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -25,28 +31,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
-const courses = ref([])
+const store = userRolestore();
+const courses = ref([]);
 
 async function fetchCourses() {
   if (!store.userid) {
-    console.error("Admin ID missing")
-    return
+    console.error("Admin ID missing");
+    return;
   }
 
   try {
-    const res = await axios.get(`http://127.0.0.1:8001/admin/${store.userid}/courses`)
-    courses.value = res.data
+    const res = await axios.get(
+      `http://127.0.0.1:8000/admin/${store.userid}/courses`
+    );
+    courses.value = res.data;
   } catch (err) {
-    console.error("Error fetching courses:", err.response?.data || err)
+    console.error("Error fetching courses:", err.response?.data || err);
   }
 }
 
-onMounted(fetchCourses)
+onMounted(fetchCourses);
 </script>
 
 <style scoped>
@@ -65,7 +73,7 @@ h2 {
 .courses-table {
   width: 100%;
   border-collapse: collapse;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   overflow: hidden;
 }

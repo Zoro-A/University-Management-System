@@ -30,7 +30,6 @@
         </table>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -52,11 +51,11 @@ async function fetchTranscript() {
 
   if (!sid) {
     transcript.value = {
-      "2022": [
+      2022: [
         { course: "CS100", grade: "A" },
         { course: "CS101", grade: "B+" },
       ],
-      "2023": [{ course: "CS201", grade: "A-" }],
+      2023: [{ course: "CS201", grade: "A-" }],
       Unknown: [{ course: "CSE101", grade: "D" }],
     };
     return;
@@ -65,7 +64,7 @@ async function fetchTranscript() {
   loading.value = true;
 
   try {
-    const url = `http://127.0.0.1:8001/student/${encodeURIComponent(
+    const url = `http://127.0.0.1:8000/student/${encodeURIComponent(
       sid
     )}/transcript`;
     const res = await axios.get(url);
@@ -148,5 +147,4 @@ h2 {
   background: #eef2ff;
   transition: 0.2s ease;
 }
-
 </style>

@@ -5,13 +5,24 @@
 
       <input v-model="course.course_id" placeholder="Course ID" />
       <input v-model="course.name" placeholder="Course Name" />
-      <input type="number" v-model.number="course.credits" placeholder="Credits" />
+      <input
+        type="number"
+        v-model.number="course.credits"
+        placeholder="Credits"
+      />
       <input v-model="course.prerequisites" placeholder="Prerequisites" />
 
       <h3>Eligible Faculty</h3>
 
-      <div v-for="(faculty, index) in course.eligible_faculty" :key="index" class="faculty-row">
-        <input v-model="course.eligible_faculty[index]" placeholder="Faculty ID" />
+      <div
+        v-for="(faculty, index) in course.eligible_faculty"
+        :key="index"
+        class="faculty-row"
+      >
+        <input
+          v-model="course.eligible_faculty[index]"
+          placeholder="Faculty ID"
+        />
         <button class="remove-btn" @click="removeFaculty(index)">❌</button>
       </div>
 
@@ -23,31 +34,33 @@
 </template>
 
 <script setup>
-import axios from "axios"
-import { ref } from "vue"
-import { userRolestore } from '../store/rolestore'
+import axios from "axios";
+import { ref } from "vue";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
+const store = userRolestore();
 
 const course = ref({
   course_id: "",
   name: "",
   eligible_faculty: [""],
   credits: 0,
-  prerequisites: ""
-})
+  prerequisites: "",
+});
 
 function addFaculty() {
-  course.value.eligible_faculty.push("")
+  course.value.eligible_faculty.push("");
 }
 
 function removeFaculty(index) {
-  course.value.eligible_faculty.splice(index, 1)
+  course.value.eligible_faculty.splice(index, 1);
 }
 
 async function submitCourse() {
-  course.value.eligible_faculty = course.value.eligible_faculty.filter(f => f.trim() !== "")
-  course.value.credits = Number(course.value.credits)
+  course.value.eligible_faculty = course.value.eligible_faculty.filter(
+    (f) => f.trim() !== ""
+  );
+  course.value.credits = Number(course.value.credits);
 
   const payload = {
     admin_id: store.userid,
@@ -55,17 +68,17 @@ async function submitCourse() {
     name: course.value.name,
     eligible_faculty: course.value.eligible_faculty,
     credits: course.value.credits,
-    prerequisites: course.value.prerequisites
-  }
+    prerequisites: course.value.prerequisites,
+  };
 
-  console.log("Sending:", payload)
+  console.log("Sending:", payload);
 
   try {
-    await axios.post("http://127.0.0.1:8001/admin/courses/add", payload)
-    alert("✅ Course Added Successfully!")
+    await axios.post("http://127.0.0.1:8000/admin/courses/add", payload);
+    alert("✅ Course Added Successfully!");
   } catch (err) {
-    console.error("Backend error:", err.response?.data || err)
-    alert("❌ Backend rejected request. Check console for details.")
+    console.error("Backend error:", err.response?.data || err);
+    alert("❌ Backend rejected request. Check console for details.");
   }
 }
 </script>
@@ -87,7 +100,7 @@ async function submitCourse() {
   background-color: #fff;
   padding: 30px 25px;
   border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   width: 400px;
   display: flex;
   flex-direction: column;

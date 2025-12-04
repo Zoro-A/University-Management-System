@@ -15,7 +15,7 @@
 
 <script setup>
 import { useRouter } from "vue-router";
-import { userRolestore } from "../store/rolestore"; // <-- ensure this path
+import { userRolestore } from "../store/rolestore";
 
 const userStore = userRolestore();
 const router = useRouter();
@@ -45,7 +45,6 @@ p {
   font-size: 16px;
 }
 
-/* Grid for cards */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -54,10 +53,9 @@ p {
   margin: 0 auto;
 }
 
-/* Individual card style */
 .card {
   background: white;
-  padding: 20px;
+  padding: 80px;
   border-radius: 12px;
   text-decoration: none;
   color: #333;
@@ -68,7 +66,6 @@ p {
   border: 1px solid #e5e5e5;
 }
 
-/* Hover effect */
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
