@@ -10,6 +10,13 @@
         :to="card.link"
         class="dashboard-card"
       >
+        <img
+          :src="card.img"
+          class="card-icon"
+          alt="icon"
+          width="20"
+          height="20"
+        />
         {{ card.title }}
       </router-link>
     </div>
@@ -19,19 +26,29 @@
 <script setup>
 import { userRolestore } from "../store/rolestore";
 import { ref } from "vue";
+import addCourse from "@/assets/images/addCourse.svg";
+import removeUser from "@/assets/images/removeUser.svg";
+import removeCourse from "@/assets/images/removeCourse.svg";
+import viewCourse from "@/assets/images/viewCourse.svg";
+import addUser from "@/assets/images/addUser.svg";
+import listUsers from "@/assets/images/listUsers.svg";
+import generateTimeTable from "@/assets/images/generateTimeTable.svg";
 
 const userStore = userRolestore();
 
-// Define dashboard cards
 const cards = ref([
-  { title: "ADD COURSE", link: "/Aaddcourse" },
-  { title: "REMOVE USER", link: "/Aremoveuser" },
-  { title: "REMOVE COURSE", link: "/Aremovecourse" },
-  { title: "VIEW COURSES", link: "/Aviewcourses" },
-  { title: "ADD STUDENT", link: "/Aaddstudent" },
-  { title: "ADD FACULTY", link: "/Aaddfaculty" },
-  { title: "LIST USERS", link: "/Alistusers" },
-  { title: "GENERATE TIMETABLE", link: "/Ageneratetimetable" },
+  { title: "ADD COURSE", link: "/Aaddcourse", img: addCourse },
+  { title: "REMOVE USER", link: "/Aremoveuser", img: removeUser },
+  { title: "REMOVE COURSE", link: "/Aremovecourse", img: removeCourse },
+  { title: "VIEW COURSES", link: "/Aviewcourses", img: viewCourse },
+  { title: "ADD STUDENT", link: "/Aaddstudent", img: addUser },
+  { title: "ADD FACULTY", link: "/Aaddfaculty", img: addUser },
+  { title: "LIST USERS", link: "/Alistusers", img: listUsers },
+  {
+    title: "GENERATE TIMETABLE",
+    link: "/Ageneratetimetable",
+    img: generateTimeTable,
+  },
 ]);
 </script>
 
@@ -42,7 +59,7 @@ const cards = ref([
   text-align: center;
   font-family: Arial, sans-serif;
   background: #f0f2f5;
-  min-height: auto;
+  min-height: 100vh;
   overflow-y: hidden;
 }
 
@@ -58,7 +75,9 @@ const cards = ref([
   font-size: 18px;
   color: #555;
 }
-
+.card-icon {
+  margin-right: 15px;
+}
 /* Cards grid */
 .cards-container {
   display: grid;
@@ -83,6 +102,7 @@ const cards = ref([
   align-items: center;
   height: 100px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 }
 
 /* Hover effect */
