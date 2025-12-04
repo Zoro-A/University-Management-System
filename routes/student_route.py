@@ -1,15 +1,29 @@
-# backend/routers/student.py
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+
 from models.student import StudentModel
+from repositories.file_student_repository import FileStudentRepository
+from repositories.file_course_repository import FileCourseRepository
+from repositories.file_grades_repository import FileGradesRepository
+from repositories.file_notifications_repository import FileNotificationsRepository
+from repositories.file_timetable_repository import FileTimetableRepository
 
 router = APIRouter(prefix="/student", tags=["student"])
+
+# Repos (singletons)
+repo_student = FileStudentRepository()
+repo_course = FileCourseRepository()
+repo_grades = FileGradesRepository()
+repo_notes = FileNotificationsRepository()
+repo_time = FileTimetableRepository()
+
+def load_student(student_id):
+    return StudentModel.load(repo_student, repo_course, repo_grades, repo_notes, repo_time, student_id)
 
 
 # --------------------
 # Request Models
-# --------------------
+# --------------------sa
 class EnrollRequest(BaseModel):
     student_id: str
     course_id: str
@@ -26,13 +40,13 @@ class UpdateProfileRequest(BaseModel):
 
 
 # --------------------
-# 1. View Dashboard
+# Dashboard
 # --------------------
 @router.get("/{student_id}/dashboard")
 def dashboard(student_id: str):
-    student = StudentModel.get_by_id(student_id)
+    student = load_student(student_id)
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
+        raise HTTPException(404, "Student not found")
 
     return {
         "user_id": student.user_id,
@@ -44,97 +58,73 @@ def dashboard(student_id: str):
     }
 
 
-# --------------------
-# 2. View Transcript
-# --------------------
+# Transcript
 @router.get("/{student_id}/transcript")
 def transcript(student_id: str):
-    student = StudentModel.get_by_id(student_id)
+    student = load_student(student_id)
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
-    
+        raise HTTPException(404, "Student not found")
     return student.get_transcript()
 
 
-# --------------------
-# 3. View Timetable
-# --------------------
+# Timetable
 @router.get("/{student_id}/timetable")
 def timetable(student_id: str):
-    student = StudentModel.get_by_id(student_id)
+    student = load_student(student_id)
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
-
+        raise HTTPException(404, "Student not found")
     return student.get_timetable()
 
 
-# --------------------
-# 4. Enroll in Course
-# --------------------
+# Enroll
 @router.post("/enroll")
 def enroll(req: EnrollRequest):
-    student = StudentModel.get_by_id(req.student_id)
+    student = load_student(req.student_id)
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
+        raise HTTPException(404, "Student not found")
 
     try:
         student.enroll(req.course_id)
         return {"status": "ok", "message": f"Enrolled in {req.course_id}"}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(400, str(e))
 
 
-# --------------------
-# 5. Drop Course
-# --------------------
+# Drop
 @router.post("/drop")
-def drop_course(req: DropRequest):
-    student = StudentModel.get_by_id(req.student_id)
+def drop(req: DropRequest):
+    student = load_student(req.student_id)
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
+        raise HTTPException(404, "Student not found")
 
     try:
         student.drop(req.course_id)
         return {"status": "ok", "message": f"Dropped {req.course_id}"}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(400, str(e))
 
 
-# --------------------
-# 6. View Notifications
-# --------------------
+# Notifications
 @router.get("/{student_id}/notifications")
 def notifications(student_id: str):
-    student = StudentModel.get_by_id(student_id)
+    student = load_student(student_id)
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
-
+        raise HTTPException(404, "Student not found")
     return student.get_notifications()
 
 
-# --------------------
-# 7. Update Profile
-# --------------------
+# Update Profile
 @router.put("/update-profile")
 def update_profile(req: UpdateProfileRequest):
-    student = StudentModel.get_by_id(req.student_id)
+    student = load_student(req.student_id)
     if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
+        raise HTTPException(404, "Student not found")
 
-    updated = student.update_profile(
-        name=req.name,
-        email=req.email,
-        password=req.password
-    )
-
+    updated = student.update_profile(req.name, req.email, req.password)
     return {"status": "ok", "message": "Profile updated", "updated": updated}
 
 
-# --------------------
-# 8. Logout
-# --------------------
+# Logout
 @router.post("/logout/{student_id}")
 def logout(student_id: str):
-    # For now this is a dummy endpoint because you're not using JWT yet.
-    # In the future, you'll invalidate the token here.
     return {"status": "ok", "message": "Logged out"}

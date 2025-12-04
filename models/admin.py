@@ -1,58 +1,88 @@
-from models.user import UserModel
-from utils.file_manager import read_file, write_file, append_record
-from utils.timetable_generator import TimetableGenerator
-import datetime
+# backend/models/admin_model.py
 
-ADMIN_FILE = "admin.txt"
-COURSES_FILE = "courses.txt"
-STUDENTS_FILE = "students.txt"
-FACULTY_FILE = "faculty.txt"
-TIMETABLE_FILE = "timetable.txt"
+from models.user import UserModel
 
 
 class AdminModel(UserModel):
-    FILE = ADMIN_FILE
+    def __init__(
+        self,
+        repo_admin,
+        repo_courses,
+        repo_students,
+        repo_faculty,
+        repo_timetable,
+        user_id,
+        name,
+        email,
+        password
+    ):
+        super().__init__(user_id, name, email, password)
 
-    @staticmethod
-    def get_by_id(admin_id: str):
-        records = read_file(ADMIN_FILE)
-        rec = next((x for x in records if x["user_id"] == admin_id), None)
-        return AdminModel(**rec) if rec else None
+        self.admin_repo = repo_admin
+        self.course_repo = repo_courses
+        self.student_repo = repo_students
+        self.faculty_repo = repo_faculty
+        self.timetable_repo = repo_timetable
 
-    # ------------------------ COURSE MANAGEMENT ------------------------
+    # -----------------------------
+    # FACTORY LOAD
+    # -----------------------------
+    @classmethod
+    def load(cls, repo_admin, repo_courses, repo_students, repo_faculty, repo_timetable, admin_id):
+        user = repo_admin.get_by_id(admin_id)
+        if not user:
+            return None
 
-    def add_course(self, course_id, course_name, eligible_faculty, credits, prerequisites):
-        courses = read_file(COURSES_FILE)
+        return cls(
+            repo_admin, repo_courses, repo_students, repo_faculty, repo_timetable,
+            user_id=user["user_id"],
+            name=user["name"],
+            email=user["email"],
+            password=user["password"],
+        )
+
+    # -----------------------------
+    # INTERNAL SAVE
+    # -----------------------------
+    def _save_self(self):
+        self.admin_repo.save({
+            "user_id": self.user_id,
+            "name": self.name,
+            "email": self.email,
+            "password": self.password
+        })
+
+    # -----------------------------
+    # BUSINESS LOGIC
+    # -----------------------------
+
+    # COURSES
+    def add_course(self, course_id, name, eligible_faculty, credits, prerequisites):
+        courses = self.course_repo.get_all()
 
         if any(c["course_id"] == course_id for c in courses):
             raise ValueError("Course already exists")
 
-        courses.append({
+        self.course_repo.save({
             "course_id": course_id,
-            "course_name": course_name,
+            "course_name": name,
             "eligible_faculty": eligible_faculty,
             "credits": credits,
             "prerequisites": prerequisites
         })
 
-        write_file(COURSES_FILE, courses)
-
     def remove_course(self, course_id):
-        courses = read_file(COURSES_FILE)
-        new_courses = [c for c in courses if c["course_id"] != course_id]
-        write_file(COURSES_FILE, new_courses)
+        self.course_repo.delete(course_id)
 
     def list_courses(self):
-        return read_file(COURSES_FILE)
+        return self.course_repo.get_all()
 
-    # ------------------------ USER MANAGEMENT ------------------------
-
+    # USERS
     def add_student(self, user_id, name, email, password):
-        students = read_file(STUDENTS_FILE)
-        if any(s["user_id"] == user_id for s in students):
+        if self.student_repo.get_by_id(user_id):
             raise ValueError("Student already exists")
 
-        append_record(STUDENTS_FILE, {
+        self.student_repo.save({
             "user_id": user_id,
             "name": name,
             "email": email,
@@ -61,11 +91,10 @@ class AdminModel(UserModel):
         })
 
     def add_faculty(self, user_id, name, email, password, courses):
-        faculty = read_file(FACULTY_FILE)
-        if any(f["user_id"] == user_id for f in faculty):
+        if self.faculty_repo.get_by_id(user_id):
             raise ValueError("Faculty already exists")
 
-        append_record(FACULTY_FILE, {
+        self.faculty_repo.save({
             "user_id": user_id,
             "name": name,
             "email": email,
@@ -74,30 +103,27 @@ class AdminModel(UserModel):
         })
 
     def remove_user(self, user_id):
-        students = read_file(STUDENTS_FILE)
-        faculty = read_file(FACULTY_FILE)
-
-        write_file(STUDENTS_FILE, [s for s in students if s["user_id"] != user_id])
-        write_file(FACULTY_FILE, [f for f in faculty if f["user_id"] != user_id])
+        self.student_repo.delete(user_id)
+        self.faculty_repo.delete(user_id)
 
     def list_users(self):
         return {
-            "students": read_file(STUDENTS_FILE),
-            "faculty": read_file(FACULTY_FILE)
+            "students": self.student_repo.get_all(),
+            "faculty": self.faculty_repo.get_all()
         }
 
-    # ------------------------ TIMETABLE ------------------------
-
+    # TIMETABLE
     def generate_timetable(self, rooms):
-        courses = read_file(COURSES_FILE)
-        faculty = read_file(FACULTY_FILE)
+        courses = self.course_repo.get_all()
+        faculty = self.faculty_repo.get_all()
 
+        # You still use your existing generator
+        from utils.timetable_generator import TimetableGenerator
         tg = TimetableGenerator()
         timetable = tg.generate(courses, faculty, rooms)
 
-        write_file(TIMETABLE_FILE, timetable)
+        self.timetable_repo.write_all(timetable)
         return timetable
 
     def view_timetable(self):
-        return read_file(TIMETABLE_FILE)
-
+        return self.timetable_repo.get_all()

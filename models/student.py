@@ -1,32 +1,32 @@
 # backend/models/student_model.py
 
 from models.user import UserModel
-from utils.file_manager import read_file, write_file
-
-STUDENTS_FILE = "students.txt"
-GRADES_FILE = "grades.txt"
-COURSES_FILE = "courses.txt"
-NOTIFICATIONS_FILE = "notifications.txt"
-TIMETABLE_FILE = "timetable.txt"
-
 
 class StudentModel(UserModel):
+    def __init__(self, repo_student, repo_course, repo_grades, repo_notifications, repo_timetable,
+                 user_id, name, email, password, enrolled=None):
 
-    def __init__(self, user_id, name, email, password, enrolled=None):
         super().__init__(user_id, name, email, password)
+
+        self.student_repo = repo_student
+        self.course_repo = repo_course
+        self.grades_repo = repo_grades
+        self.notifications_repo = repo_notifications
+        self.timetable_repo = repo_timetable
+
         self.enrolled = enrolled or []
 
-    # ------------------------------------------------------
-    # STATIC LOADERS
-    # ------------------------------------------------------
-    @staticmethod
-    def get_by_id(student_id: str):
-        data = read_file(STUDENTS_FILE)
-        user = next((u for u in data if u["user_id"] == student_id), None)
+    # -----------------------------
+    # LOAD STUDENT (FACTORY METHOD)
+    # -----------------------------
+    @classmethod
+    def load(cls, repo_student, repo_course, repo_grades, repo_notifications, repo_timetable, student_id):
+        user = repo_student.get_by_id(student_id)
         if not user:
             return None
-
-        return StudentModel(
+        
+        return cls(
+            repo_student, repo_course, repo_grades, repo_notifications, repo_timetable,
             user_id=user["user_id"],
             name=user["name"],
             email=user["email"],
@@ -34,65 +34,48 @@ class StudentModel(UserModel):
             enrolled=user.get("enrolled", [])
         )
 
-    @staticmethod
-    def _save_all(students):
-        write_file(STUDENTS_FILE, students)
-
-    # ------------------------------------------------------
-    # INTERNAL SAVE METHOD
-    # ------------------------------------------------------
+    # -----------------------------
+    # SAVE
+    # -----------------------------
     def _save_self(self):
-        all_data = read_file(STUDENTS_FILE)
-        for s in all_data:
-            if s["user_id"] == self.user_id:
-                s["name"] = self.name
-                s["email"] = self.email
-                s["password"] = self.password
-                s["enrolled"] = self.enrolled
-                break
+        self.student_repo.save({
+            "user_id": self.user_id,
+            "name": self.name,
+            "email": self.email,
+            "password": self.password,
+            "enrolled": self.enrolled
+        })
 
-        write_file(STUDENTS_FILE, all_data)
+    # ---------------------------------
+    # BUSINESS LOGIC (UNCHANGED OUTPUT)
+    # ---------------------------------
 
-    # ------------------------------------------------------
-    # 1. ENROLL IN COURSE
-    # ------------------------------------------------------
     def enroll(self, course_id):
-        courses = read_file(COURSES_FILE)
-        grades = read_file(GRADES_FILE)
+        courses = self.course_repo.get_all()
+        grades = self.grades_repo.get_all()
 
-        # Already enrolled?
         if course_id in self.enrolled:
             raise ValueError("Already enrolled in this course")
 
-        # Check if course exists
         course = next((c for c in courses if c["course_id"] == course_id), None)
         if not course:
             raise ValueError("Invalid course")
 
-        # Check prerequisites (correct key: prerequisites)
         prereq = course.get("prerequisites", "")
         if prereq:
-            passed = False
-            for g in grades:
-                if (
-                    g["student_id"] == self.user_id and
-                    g["course_id"] == prereq and
-                    g["grade"] != "F"
-                ):
-                    passed = True
-                    break
-
+            passed = any(
+                g["student_id"] == self.user_id and 
+                g["course_id"] == prereq and 
+                g["grade"] != "F"
+                for g in grades
+            )
             if not passed:
                 raise ValueError(f"Prerequisite required: {prereq}")
 
-        # Add enrollment
         self.enrolled.append(course_id)
         self._save_self()
         return True
 
-    # ------------------------------------------------------
-    # 2. DROP COURSE
-    # ------------------------------------------------------
     def drop(self, course_id):
         if course_id not in self.enrolled:
             raise ValueError("You are not enrolled in this course")
@@ -101,52 +84,31 @@ class StudentModel(UserModel):
         self._save_self()
         return True
 
-    # ------------------------------------------------------
-    # 3. TRANSCRIPT
-    # ------------------------------------------------------
     def get_transcript(self):
-        grades = read_file(GRADES_FILE)
-
-        # Filter only this student's grades
+        grades = self.grades_repo.get_all()
         student_grades = [g for g in grades if g["student_id"] == self.user_id]
 
         transcript = {}
 
         for g in student_grades:
             year = str(g.get("year", "Unknown"))
-
-            if year not in transcript:
-                transcript[year] = []
-
-            transcript[year].append({
+            transcript.setdefault(year, []).append({
                 "course": g["course_id"],
                 "grade": g["grade"]
             })
-
         return transcript
 
-
-    # ------------------------------------------------------
-    # 4. NOTIFICATIONS
-    # ------------------------------------------------------
     def get_notifications(self):
-        notes = read_file(NOTIFICATIONS_FILE)
-        # notifications stored as {to: student_id/all, message, from}
+        notes = self.notifications_repo.get_all()
         return [
             n for n in notes
             if n.get("to") == self.user_id or n.get("to") == "all"
         ]
 
-    # ------------------------------------------------------
-    # 5. TIMETABLE
-    # ------------------------------------------------------
     def get_timetable(self):
-        timetable = read_file(TIMETABLE_FILE)
+        timetable = self.timetable_repo.get_all()
         return [t for t in timetable if t["course_id"] in self.enrolled]
 
-    # ------------------------------------------------------
-    # 6. UPDATE PROFILE
-    # ------------------------------------------------------
     def update_profile(self, name=None, email=None, password=None):
         if name:
             self.name = name
