@@ -14,6 +14,7 @@ import Aremoveuser from '../views/Aremoveuser.vue'
 import Ageneratetimetable from '../views/Ageneratetimetable.vue'
 import adashboard from '../views/adashboard.vue'
 import Fassigngrades from '../views/Fassigngrades.vue'
+import Fmarkattendance from '../views/Fmarkattendance.vue'
 import Fviewtimetable from '../views/Fviewtimetable.vue'
 import FsendNotifications from '../views/FsendNotifications.vue'
 import Sadddropcourse from '../views/Sadddropcourse.vue'
@@ -36,6 +37,7 @@ const routes = [
   {path:'/Alistusers',component:Alistusers},
   {path:'/Ageneratetimetable',component:Ageneratetimetable},
   {path:'/Fassigngrades', component: Fassigngrades},
+  {path:'/Fmarkattendance', component: Fmarkattendance},
   {path:'/Fviewtimetable', component: Fviewtimetable},
   {path:'/Aaddfaculty',component:Aaddfaculty},
     {path:'/adashboard', component: adashboard},

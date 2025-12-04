@@ -17,6 +17,11 @@
         <p>Check your scheduled classes.</p>
       </router-link>
 
+      <router-link to="/Fmarkattendance" class="dashboard-card">
+        <h3>Mark Attendance</h3>
+        <p>Record daily attendance for students in your courses.</p>
+      </router-link>
+
       <router-link to="/FsendNotifications" class="dashboard-card">
         <h3>Send Notifications</h3>
         <p>Communicate updates to students.</p>
