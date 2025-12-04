@@ -76,6 +76,22 @@ def timetable(student_id: str):
     return student.get_timetable()
 
 
+# Enrolled Courses
+@router.get("/{student_id}/courses")
+def enrolled_courses(student_id: str):
+    """
+    Return a simple list of course IDs the student is currently enrolled in.
+    """
+    student = load_student(student_id)
+    if not student:
+        raise HTTPException(404, "Student not found")
+
+    return {
+        "student_id": student.user_id,
+        "enrolled_courses": student.enrolled,
+    }
+
+
 # Enroll
 @router.post("/enroll")
 def enroll(req: EnrollRequest):
