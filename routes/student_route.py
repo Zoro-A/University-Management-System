@@ -2,20 +2,20 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from models.student import StudentModel
-from repositories.file_student_repository import FileStudentRepository
-from repositories.file_course_repository import FileCourseRepository
-from repositories.file_grades_repository import FileGradesRepository
-from repositories.file_notifications_repository import FileNotificationsRepository
-from repositories.file_timetable_repository import FileTimetableRepository
+from repositories.postgres_student_repository import PostgresStudentRepository
+from repositories.postgres_course_repository import PostgresCourseRepository
+from repositories.postgres_grades_repository import PostgresGradesRepository
+from repositories.postgres_notifications_repository import PostgresNotificationsRepository
+from repositories.postgres_timetable_repository import PostgresTimetableRepository
 
 router = APIRouter(prefix="/student", tags=["student"])
 
-# Repos (singletons)
-repo_student = FileStudentRepository()
-repo_course = FileCourseRepository()
-repo_grades = FileGradesRepository()
-repo_notes = FileNotificationsRepository()
-repo_time = FileTimetableRepository()
+# Repos (singletons) - Using PostgreSQL repositories
+repo_student = PostgresStudentRepository()
+repo_course = PostgresCourseRepository()
+repo_grades = PostgresGradesRepository()
+repo_notes = PostgresNotificationsRepository()
+repo_time = PostgresTimetableRepository()
 
 def load_student(student_id):
     return StudentModel.load(repo_student, repo_course, repo_grades, repo_notes, repo_time, student_id)
@@ -74,6 +74,22 @@ def timetable(student_id: str):
     if not student:
         raise HTTPException(404, "Student not found")
     return student.get_timetable()
+
+
+# Enrolled Courses
+@router.get("/{student_id}/courses")
+def enrolled_courses(student_id: str):
+    """
+    Return a simple list of course IDs the student is currently enrolled in.
+    """
+    student = load_student(student_id)
+    if not student:
+        raise HTTPException(404, "Student not found")
+
+    return {
+        "student_id": student.user_id,
+        "enrolled_courses": student.enrolled,
+    }
 
 
 # Enroll

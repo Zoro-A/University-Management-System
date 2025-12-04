@@ -23,6 +23,6 @@ class FileFacultyRepository(IFacultyRepository):
     def get_by_id(self, faculty_id: str):
         faculty = read_file(self.filepath)
         for f in faculty:
-            if f.get("id") == faculty_id or f.get("user_id") == faculty_id:
+            if f.get("user_id") == faculty_id:
                 return f
         return None

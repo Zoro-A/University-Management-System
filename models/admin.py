@@ -107,9 +107,25 @@ class AdminModel(UserModel):
         self.faculty_repo.delete(user_id)
 
     def list_users(self):
+        students = self.student_repo.get_all() or []
+        faculty = self.faculty_repo.get_all() or []
+
+        # Helper to sort IDs like S1, S2, ..., S10 by their numeric part
+        def _id_key(user):
+            uid = user.get("user_id", "") or ""
+            # Extract trailing digits; fallback to 0 if none
+            num = ""
+            for ch in uid:
+                if ch.isdigit():
+                    num += ch
+            return int(num) if num.isdigit() else 0
+
+        students_sorted = sorted(students, key=_id_key)
+        faculty_sorted = sorted(faculty, key=_id_key)
+
         return {
-            "students": self.student_repo.get_all(),
-            "faculty": self.faculty_repo.get_all()
+            "students": students_sorted,
+            "faculty": faculty_sorted,
         }
 
     # TIMETABLE

@@ -35,16 +35,30 @@ class StudentModel(UserModel):
         )
 
     # -----------------------------
-    # SAVE
+    # PERSIST CHANGES
     # -----------------------------
     def _save_self(self):
-        self.student_repo.save({
-            "user_id": self.user_id,
-            "name": self.name,
-            "email": self.email,
-            "password": self.password,
-            "enrolled": self.enrolled
-        })
+        """
+        Persist the current state of the student.
+
+        The student record itself is created once via the admin "add student"
+        flow. After that, any changes (enrollment, drop, profile update) should
+        UPDATE the existing record instead of trying to create a new one.
+
+        Previously this method called `save`, which is meant for creation and
+        enforces unique student IDs. That caused "Student ID already exists"
+        whenever a student tried to enroll/drop/update, because it attempted to
+        insert a duplicate row. We now delegate to `update` instead.
+        """
+        self.student_repo.update(
+            self.user_id,
+            {
+                "name": self.name,
+                "email": self.email,
+                "password": self.password,
+                "enrolled": self.enrolled,
+            },
+        )
 
     # ---------------------------------
     # BUSINESS LOGIC (UNCHANGED OUTPUT)
@@ -91,8 +105,8 @@ class StudentModel(UserModel):
         transcript = {}
 
         for g in student_grades:
-            year = str(g.get("year", "Unknown"))
-            transcript.setdefault(year, []).append({
+            semester = str(g.get("semester", "Unknown"))
+            transcript.setdefault(semester, []).append({
                 "course": g["course_id"],
                 "grade": g["grade"]
             })

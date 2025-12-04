@@ -2,20 +2,20 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from models.admin import AdminModel
-from repositories.file_admin_repository import FileAdminRepository
-from repositories.file_course_repository import FileCourseRepository
-from repositories.file_student_repository import FileStudentRepository
-from repositories.file_faculty_repository import FileFacultyRepository
-from repositories.file_timetable_repository import FileTimetableRepository
+from repositories.postgres_admin_repository import PostgresAdminRepository
+from repositories.postgres_course_repository import PostgresCourseRepository
+from repositories.postgres_student_repository import PostgresStudentRepository
+from repositories.postgres_faculty_repository import PostgresFacultyRepository
+from repositories.postgres_timetable_repository import PostgresTimetableRepository
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-# Repo singletons
-repo_admin = FileAdminRepository()
-repo_course = FileCourseRepository()
-repo_student = FileStudentRepository()
-repo_faculty = FileFacultyRepository()
-repo_timetable = FileTimetableRepository()
+# Repo singletons - Using PostgreSQL repositories
+repo_admin = PostgresAdminRepository()
+repo_course = PostgresCourseRepository()
+repo_student = PostgresStudentRepository()
+repo_faculty = PostgresFacultyRepository()
+repo_timetable = PostgresTimetableRepository()
 
 
 def load_admin(admin_id):
