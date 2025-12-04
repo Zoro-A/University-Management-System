@@ -6,12 +6,23 @@
       <input v-model="faculty.faculty_id" placeholder="Faculty ID" />
       <input v-model="faculty.faculty_name" placeholder="Full Name" />
       <input v-model="faculty.email" placeholder="Email" />
-      <input type="password" v-model="faculty.password" placeholder="Password" />
+      <input
+        type="password"
+        v-model="faculty.password"
+        placeholder="Password"
+      />
 
       <h3>Eligible Courses</h3>
 
-      <div v-for="(course, index) in faculty.eligible_courses" :key="index" class="course-row">
-        <input v-model="faculty.eligible_courses[index]" placeholder="Course ID" />
+      <div
+        v-for="(course, index) in faculty.eligible_courses"
+        :key="index"
+        class="course-row"
+      >
+        <input
+          v-model="faculty.eligible_courses[index]"
+          placeholder="Course ID"
+        />
         <button class="remove-btn" @click="removeCourse(index)">❌</button>
       </div>
 
@@ -22,32 +33,32 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
-import { ref } from 'vue'
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
+import { ref } from "vue";
 
-const store = userRolestore()
+const store = userRolestore();
 
 const faculty = ref({
   faculty_id: "",
   faculty_name: "",
   email: "",
   password: "",
-  eligible_courses: [""]
-})
+  eligible_courses: [""],
+});
 
 function addCourse() {
-  faculty.value.eligible_courses.push("")
+  faculty.value.eligible_courses.push("");
 }
 
 function removeCourse(index) {
-  faculty.value.eligible_courses.splice(index, 1)
+  faculty.value.eligible_courses.splice(index, 1);
 }
 
 async function submitFaculty() {
   if (!store.userid) {
-    alert("Admin ID missing! Please login again.")
-    return
+    alert("Admin ID missing! Please login again.");
+    return;
   }
 
   const payload = {
@@ -56,23 +67,22 @@ async function submitFaculty() {
     name: faculty.value.faculty_name,
     email: faculty.value.email,
     password: faculty.value.password,
-    courses: faculty.value.eligible_courses.filter(c => c.trim() !== "")
-  }
+    courses: faculty.value.eligible_courses.filter((c) => c.trim() !== ""),
+  };
 
-  console.log("Sending faculty payload:", payload)
+  console.log("Sending faculty payload:", payload);
 
   try {
     const response = await axios.post(
-      'http://127.0.0.1:8001/admin/faculty/add',
+      "http://127.0.0.1:8000/admin/faculty/add",
       payload
-    )
+    );
 
-    console.log("Response:", response.data)
-    alert("✅ Faculty added successfully")
-
+    console.log("Response:", response.data);
+    alert("✅ Faculty added successfully");
   } catch (err) {
-    console.error("Add faculty error:", err.response?.data || err)
-    alert("❌ Failed to add faculty — check console for details")
+    console.error("Add faculty error:", err.response?.data || err);
+    alert("❌ Failed to add faculty — check console for details");
   }
 }
 </script>
@@ -94,7 +104,7 @@ async function submitFaculty() {
   background-color: #fff;
   padding: 30px 25px;
   border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   width: 400px;
   display: flex;
   flex-direction: column;

@@ -11,41 +11,41 @@
 </template>
 
 <script setup>
-import axios from "axios"
-import { ref } from "vue"
-import { userRolestore } from '../store/rolestore'
+import axios from "axios";
+import { ref } from "vue";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
+const store = userRolestore();
 
 const course = ref({
-  course_id: ""
-})
+  course_id: "",
+});
 
 async function submitCourse() {
   if (!store.userid) {
-    alert("Admin ID missing. Please login first.")
-    return
+    alert("Admin ID missing. Please login first.");
+    return;
   }
 
   if (!course.value.course_id.trim()) {
-    alert("Please enter a valid Course ID")
-    return
+    alert("Please enter a valid Course ID");
+    return;
   }
 
   const payload = {
     admin_id: store.userid,
-    course_id: course.value.course_id
-  }
+    course_id: course.value.course_id,
+  };
 
-  console.log("Sending:", payload)
+  console.log("Sending:", payload);
 
   try {
-    await axios.post("http://127.0.0.1:8001/admin/courses/remove", payload)
-    alert("✅ Course Removed Successfully!")
-    course.value.course_id = ''
+    await axios.post("http://127.0.0.1:8000/admin/courses/remove", payload);
+    alert("✅ Course Removed Successfully!");
+    course.value.course_id = "";
   } catch (err) {
-    console.error("Backend error:", err.response?.data || err)
-    alert("❌ Backend rejected request. Check console for details.")
+    console.error("Backend error:", err.response?.data || err);
+    alert("❌ Backend rejected request. Check console for details.");
   }
 }
 </script>
@@ -67,7 +67,7 @@ async function submitCourse() {
   background-color: #fff;
   padding: 30px 25px;
   border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   width: 400px;
   display: flex;
   flex-direction: column;

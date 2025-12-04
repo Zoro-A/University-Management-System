@@ -6,7 +6,11 @@
       <input v-model="student.user_id" placeholder="Student User ID" />
       <input v-model="student.name" placeholder="Full Name" />
       <input v-model="student.email" placeholder="Email" />
-      <input type="password" v-model="student.password" placeholder="Password" />
+      <input
+        type="password"
+        v-model="student.password"
+        placeholder="Password"
+      />
 
       <button class="submit-btn" @click="submitStudent">Submit Student</button>
     </div>
@@ -14,18 +18,18 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import { ref } from 'vue'
-import { userRolestore } from '../store/rolestore'
+import axios from "axios";
+import { ref } from "vue";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
+const store = userRolestore();
 
 const student = ref({
-  user_id: '',
-  name: '',
-  email: '',
-  password: ''
-})
+  user_id: "",
+  name: "",
+  email: "",
+  password: "",
+});
 
 async function submitStudent() {
   const payload = {
@@ -33,21 +37,21 @@ async function submitStudent() {
     user_id: student.value.user_id,
     name: student.value.name,
     email: student.value.email,
-    password: student.value.password
-  }
+    password: student.value.password,
+  };
 
-  console.log('Sending student payload:', payload)
+  console.log("Sending student payload:", payload);
 
   try {
-    await axios.post('http://127.0.0.1:8001/admin/student/add', payload)
-    alert('✅ Student added successfully')
-    student.value.user_id = ''
-    student.value.name = ''
-    student.value.email = ''
-    student.value.password = ''
+    await axios.post("http://127.0.0.1:8000/admin/student/add", payload);
+    alert("✅ Student added successfully");
+    student.value.user_id = "";
+    student.value.name = "";
+    student.value.email = "";
+    student.value.password = "";
   } catch (err) {
-    console.error('Add student error:', err.response?.data || err)
-    alert('❌ Failed to add student — check console for details')
+    console.error("Add student error:", err.response?.data || err);
+    alert("❌ Failed to add student — check console for details");
   }
 }
 </script>
@@ -69,7 +73,7 @@ async function submitStudent() {
   background-color: #fff;
   padding: 30px 25px;
   border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   width: 400px;
   display: flex;
   flex-direction: column;

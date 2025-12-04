@@ -9,41 +9,45 @@
       </div>
 
       <button class="add-btn" @click="addRoom">+ Add Room</button>
-      <button class="submit-btn" @click="submitGenerate">Generate Timetable</button>
+      <button class="submit-btn" @click="submitGenerate">
+        Generate Timetable
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import axios from 'axios'
-import { userRolestore } from '../store/rolestore'
+import { ref } from "vue";
+import axios from "axios";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
+const store = userRolestore();
 
-const rooms = ref([''])
+const rooms = ref([""]);
 
 function addRoom() {
-  rooms.value.push('')
+  rooms.value.push("");
 }
 
 function removeRoom(index) {
-  rooms.value.splice(index, 1)
+  rooms.value.splice(index, 1);
 }
 
 async function submitGenerate() {
-  const cleaned = rooms.value.map(r => String(r).trim()).filter(r => r !== '')
-  const payload = { admin_id: store.userid, rooms: cleaned }
+  const cleaned = rooms.value
+    .map((r) => String(r).trim())
+    .filter((r) => r !== "");
+  const payload = { admin_id: store.userid, rooms: cleaned };
 
-  console.log('Sending generate timetable payload:', payload)
+  console.log("Sending generate timetable payload:", payload);
 
   try {
-    await axios.post('http://127.0.0.1:8001/admin/timetable/generate', payload)
-    alert('✅ Timetable generation request sent')
-    rooms.value = ['']
+    await axios.post("http://127.0.0.1:8000/admin/timetable/generate", payload);
+    alert("✅ Timetable generation request sent");
+    rooms.value = [""];
   } catch (err) {
-    console.error('Generate timetable error:', err.response?.data || err)
-    alert('❌ Failed to send request — check console for details')
+    console.error("Generate timetable error:", err.response?.data || err);
+    alert("❌ Failed to send request — check console for details");
   }
 }
 </script>
@@ -65,7 +69,7 @@ async function submitGenerate() {
   background-color: #fff;
   padding: 30px 25px;
   border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   width: 400px;
   display: flex;
   flex-direction: column;

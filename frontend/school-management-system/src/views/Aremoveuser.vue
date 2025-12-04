@@ -11,31 +11,31 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import { ref } from 'vue'
-import { userRolestore } from '../store/rolestore'
+import axios from "axios";
+import { ref } from "vue";
+import { userRolestore } from "../store/rolestore";
 
-const store = userRolestore()
+const store = userRolestore();
 
 const user = ref({
-  user_id: ''
-})
+  user_id: "",
+});
 
 async function submitRemove() {
   const payload = {
     admin_id: store.userid,
-    user_id: user.value.user_id
-  }
+    user_id: user.value.user_id,
+  };
 
-  console.log('Sending remove-user payload:', payload)
+  console.log("Sending remove-user payload:", payload);
 
   try {
-    await axios.post('http://127.0.0.1:8001/admin/faculty/add', payload)
-    alert('✅ Request sent successfully')
-    user.value.user_id = ''
+    await axios.post("http://127.0.0.1:8000/admin/faculty/add", payload);
+    alert("✅ Request sent successfully");
+    user.value.user_id = "";
   } catch (err) {
-    console.error('Remove user error:', err.response?.data || err)
-    alert('❌ Failed to send request — check console for details')
+    console.error("Remove user error:", err.response?.data || err);
+    alert("❌ Failed to send request — check console for details");
   }
 }
 </script>
@@ -57,7 +57,7 @@ async function submitRemove() {
   background-color: #fff;
   padding: 30px 25px;
   border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   width: 400px;
   display: flex;
   flex-direction: column;

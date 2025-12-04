@@ -14,55 +14,54 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref } from 'vue'
-import axios from 'axios'
-import { useRouter } from 'vue-router'
-import { userRolestore } from '../store/rolestore'
+import { ref } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+import { userRolestore } from "../store/rolestore";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
-const router = useRouter()
-const userStore = userRolestore()
+const router = useRouter();
+const userStore = userRolestore();
 
-const username = ref('')
-const email = ref('')
-const password = ref('')
-
-console.log( userStore.role)
-console.log( userStore.username)
-console.log( userStore.userid)  
+const username = ref("");
+const email = ref("");
+const password = ref("");
 
 async function updateProfile() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+
+  if (!userData || !userData.id) {
+    return;
+  }
+
+  const userId = userData.id;
   try {
-    // Debug logs
-    console.log("Updating profile for user ID:", userStore.userid)
-    console.log("Store state:", userStore)
-    console.log("Store userid:", userStore.userid)
-    console.log("Store username:", userStore.username)
-    console.log("Store role:", userStore.role)  
-    if (!userStore.userid) {
-      alert("Error: No user ID found. Please login again.")
-      router.push("/login")
-      return
+    if (!userId) {
+      alert("Error: No user ID found. Please login again.");
+      router.push("/login");
+      return;
     }
 
     // Correct request
     const response = await axios.put(
-      "http://127.0.0.1:8001/student/update-profile",
-     {
-student_id: userStore.userid,
-name: username.value,
-email: email.value,
-password: password.value
-}
-    )
-
-    console.log("Profile update success:", response.data)
-    alert("Profile Updated Successfully")
-
+      "http://127.0.0.1:8000/student/update-profile",
+      {
+        student_id: userId,
+        name: username.value,
+        email: email.value,
+        password: password.value,
+      }
+    );
+    toast.success("Profile Updated Successfully!", {
+      autoClose: 3000,
+      position: "top-right",
+      pauseOnHover: true,
+      closeOnClick: true,
+    });
   } catch (error) {
-    console.error("updation failed:", error.response?.data || error.message)
-    alert("updation failed: " + (error.response?.data?.detail || error.message))
+    console.error("updation failed:", error.response?.data || error.message);
   }
 }
 </script>

@@ -42,7 +42,8 @@ const menuItems = computed(() => {
   const student = [
     { title: "Dashboard", link: "/sdashboard" },
     { title: "My Courses", link: "/scourses" },
-    { title: "Assignments", link: "/sassignments" },
+    { title: "Transcript", link: "/transcript" },
+    { title: "Add or drop course", link: "/Sadddropcourse" },
   ];
 
   const faculty = [

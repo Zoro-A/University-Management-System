@@ -17,34 +17,36 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted } from "vue";
+import axios from "axios";
 
-const enrolled_courses = ref([])
+const enrolled_courses = ref([]);
 
 async function fetchCourses() {
-  const userData = JSON.parse(localStorage.getItem("userData"))
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   if (!userData || !userData.id) {
-    console.error("User not logged in")
-    return
+    console.error("User not logged in");
+    return;
   }
 
-  const userId = userData.id
+  const userId = userData.id;
 
   try {
-    const response = await axios.get(`http://127.0.0.1:8001/student/${userId}/courses`)
-    
-    // ✅ CORRECT DATA ACCESS
-    enrolled_courses.value = response.data.enrolled_courses
+    const response = await axios.get(
+      `http://127.0.0.1:8000/student/${userId}/courses`
+    );
 
-    console.log(enrolled_courses.value)
+    // ✅ CORRECT DATA ACCESS
+    enrolled_courses.value = response.data.enrolled_courses;
+
+    console.log(enrolled_courses.value);
   } catch (error) {
-    console.error("Error fetching courses:", error)
+    console.error("Error fetching courses:", error);
   }
 }
 
-onMounted(fetchCourses)
+onMounted(fetchCourses);
 </script>
 <style scoped>
 table {
@@ -120,7 +122,8 @@ tbody tr td[colspan] {
 
 /* Mobile Responsive */
 @media (max-width: 600px) {
-  th, td {
+  th,
+  td {
     padding: 10px;
     font-size: 13px;
   }
