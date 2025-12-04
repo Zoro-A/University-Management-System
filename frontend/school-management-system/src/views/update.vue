@@ -48,7 +48,7 @@ async function updateProfile() {
 
     // Correct request
     const response = await axios.put(
-      "http://127.0.0.1:8000/student/update-profile",
+      "http://127.0.0.1:8001/student/update-profile",
      {
 student_id: userStore.userid,
 name: username.value,

@@ -50,7 +50,7 @@ async function fetchTimetable() {
 
   loading.value = true;
   try {
-    const url = `http://127.0.0.1:8000/faculty/${encodeURIComponent(
+    const url = `http://127.0.0.1:8001/faculty/${encodeURIComponent(
       userId
     )}/timetable`;
     const res = await axios.get(url);

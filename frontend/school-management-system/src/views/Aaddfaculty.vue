@@ -63,7 +63,7 @@ async function submitFaculty() {
 
   try {
     const response = await axios.post(
-      'http://127.0.0.1:8000/admin/faculty/add',
+      'http://127.0.0.1:8001/admin/faculty/add',
       payload
     )
 

@@ -47,7 +47,7 @@ async function fetchUsers() {
 
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8000/admin/${userId}/users`
+      `http://127.0.0.1:8001/admin/${userId}/users`
     );
     users.value = response.data;
   } catch (error) {

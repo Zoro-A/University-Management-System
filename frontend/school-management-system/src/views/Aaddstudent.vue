@@ -39,7 +39,7 @@ async function submitStudent() {
   console.log('Sending student payload:', payload)
 
   try {
-    await axios.post('http://127.0.0.1:8000/admin/student/add', payload)
+    await axios.post('http://127.0.0.1:8001/admin/student/add', payload)
     alert('✅ Student added successfully')
     student.value.user_id = ''
     student.value.name = ''

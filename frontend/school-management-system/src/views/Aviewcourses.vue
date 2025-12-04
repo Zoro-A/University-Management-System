@@ -39,7 +39,7 @@ async function fetchCourses() {
   }
 
   try {
-    const res = await axios.get(`http://127.0.0.1:8000/admin/${store.userid}/courses`)
+    const res = await axios.get(`http://127.0.0.1:8001/admin/${store.userid}/courses`)
     courses.value = res.data
   } catch (err) {
     console.error("Error fetching courses:", err.response?.data || err)

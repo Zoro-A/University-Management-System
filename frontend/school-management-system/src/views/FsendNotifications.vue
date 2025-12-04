@@ -122,7 +122,7 @@ async function fetchCourses() {
   const userId = userData.id;
   try {
     const res = await axios.get(
-      `http://127.0.0.1:8000/faculty/${encodeURIComponent(userId)}/courses`
+      `http://127.0.0.1:8001/faculty/${encodeURIComponent(userId)}/courses`
     );
     courses.value = Array.isArray(res.data) ? res.data : [];
   } catch (err) {
@@ -144,7 +144,7 @@ async function loadAllStudents() {
     for (const course of courses.value) {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/faculty/${encodeURIComponent(
+          `http://127.0.0.1:8001/faculty/${encodeURIComponent(
             userId
           )}/students/${encodeURIComponent(course)}`
         );
@@ -173,7 +173,7 @@ async function loadStudentsForCourse() {
     // if already loaded, just use from map
     if (!studentsByCourse[selectedCourse.value]) {
       const res = await axios.get(
-        `http://127.0.0.1:8000/faculty/${encodeURIComponent(
+        `http://127.0.0.1:8001/faculty/${encodeURIComponent(
           userId
         )}/students/${encodeURIComponent(selectedCourse.value)}`
       );
@@ -206,7 +206,7 @@ async function sendToSelected() {
     const fid = store.userid;
     const tasks = selectedRecipients.value.map((id) => {
       const payload = { faculty_id: fid, target: id, message: message.value };
-      return axios.post("http://127.0.0.1:8000/faculty/notify", payload);
+      return axios.post("http://127.0.0.1:8001/faculty/notify", payload);
     });
     const settled = await Promise.allSettled(tasks);
     const failed = settled.filter((s) => s.status === "rejected");
@@ -226,7 +226,7 @@ async function sendToAll() {
   try {
     const fid = store.userid;
     const payload = { faculty_id: fid, target: "all", message: message.value };
-    await axios.post("http://127.0.0.1:8000/faculty/notify", payload);
+    await axios.post("http://127.0.0.1:8001/faculty/notify", payload);
     result.value = "Notification sent to all.";
   } catch (err) {
     console.error("Send to all error", err);

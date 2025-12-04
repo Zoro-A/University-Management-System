@@ -50,7 +50,7 @@ const STUDENT_ID = ref('S1')
 
 async function fetchCourses() {
   try {
-    const res = await axios.get(`http://127.0.0.1:8000/admin/${encodeURIComponent(ADMIN_ID)}/courses`)
+    const res = await axios.get(`http://127.0.0.1:8001/admin/${encodeURIComponent(ADMIN_ID)}/courses`)
     courses.value = Array.isArray(res.data) ? res.data : []
   } catch (err) {
     courses.value = []
@@ -65,7 +65,7 @@ async function enrollCourse(courseId) {
   statusMsg.value = 'Sending enrollment request...'
 
   try {
-    await axios.post('http://127.0.0.1:8000/student/enroll', {
+    await axios.post('http://127.0.0.1:8001/student/enroll', {
       student_id: STUDENT_ID.value,
       course_id: courseId
     })
@@ -81,7 +81,7 @@ async function dropCourse(courseId) {
   statusMsg.value = 'Sending drop request...'
 
   try {
-    await axios.post('http://127.0.0.1:8000/student/drop', {
+    await axios.post('http://127.0.0.1:8001/student/drop', {
       student_id: STUDENT_ID.value,
       course_id: courseId
     })

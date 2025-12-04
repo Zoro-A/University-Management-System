@@ -65,7 +65,7 @@ async function fetchTranscript() {
   loading.value = true;
 
   try {
-    const url = `http://127.0.0.1:8000/student/${encodeURIComponent(
+    const url = `http://127.0.0.1:8001/student/${encodeURIComponent(
       sid
     )}/transcript`;
     const res = await axios.get(url);

@@ -40,7 +40,7 @@ async function submitCourse() {
   console.log("Sending:", payload)
 
   try {
-    await axios.post("http://127.0.0.1:8000/admin/courses/remove", payload)
+    await axios.post("http://127.0.0.1:8001/admin/courses/remove", payload)
     alert("✅ Course Removed Successfully!")
     course.value.course_id = ''
   } catch (err) {
