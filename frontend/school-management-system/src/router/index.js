@@ -17,7 +17,7 @@ import Fassigngrades from '../views/Fassigngrades.vue'
 import Fviewtimetable from '../views/Fviewtimetable.vue'
 import FsendNotifications from '../views/FsendNotifications.vue'
 import Sadddropcourse from '../views/Sadddropcourse.vue'
-
+import Sviewcourses from '../views/Sviewcourses.vue'
 
 import fdashboard from '../views/fdashboard.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -41,7 +41,8 @@ const routes = [
     {path:'/adashboard', component: adashboard},
      {path:'/fdashboard', component: fdashboard},
      {path:'/FsendNotifications', component: FsendNotifications},
-     {path:'/Sadddropcourse', component: Sadddropcourse}
+     {path:'/Sadddropcourse', component: Sadddropcourse},
+{path:'/scourses', component: Sviewcourses}
 
 ]
 

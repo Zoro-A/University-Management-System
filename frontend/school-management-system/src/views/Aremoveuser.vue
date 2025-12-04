@@ -30,7 +30,7 @@ async function submitRemove() {
   console.log('Sending remove-user payload:', payload)
 
   try {
-    await axios.post('http://127.0.0.1:8000/admin/faculty/add', payload)
+    await axios.post('http://127.0.0.1:8001/admin/faculty/add', payload)
     alert('✅ Request sent successfully')
     user.value.user_id = ''
   } catch (err) {
