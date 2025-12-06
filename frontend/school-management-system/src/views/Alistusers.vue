@@ -32,6 +32,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 const users = ref({});
@@ -47,7 +48,7 @@ async function fetchUsers() {
 
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8000/admin/${userId}/users`
+      `${apiConfig.baseURL}/admin/${userId}/users`
     );
     users.value = response.data;
   } catch (error) {

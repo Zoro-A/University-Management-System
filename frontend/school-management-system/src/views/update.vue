@@ -21,6 +21,7 @@ import { useRouter } from "vue-router";
 import { userRolestore } from "../store/rolestore";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import apiConfig from "../config/api";
 
 const router = useRouter();
 const userStore = userRolestore();
@@ -46,7 +47,7 @@ async function updateProfile() {
 
     // Correct request
     const response = await axios.put(
-      "http://127.0.0.1:8000/student/update-profile",
+      apiConfig.url("student/update-profile"),
       {
         student_id: userId,
         name: username.value,

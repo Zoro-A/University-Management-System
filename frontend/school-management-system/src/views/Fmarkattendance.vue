@@ -104,6 +104,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 
@@ -120,7 +121,7 @@ async function fetchCourses() {
   const userId = userData.id;
   try {
     const resp = await axios.get(
-      `http://127.0.0.1:8000/faculty/${userId}/courses`
+      `${apiConfig.baseURL}/faculty/${userId}/courses`
     );
     courses.value = resp.data;
   } catch (err) {
@@ -137,7 +138,7 @@ async function getstudents() {
     // initialize maps
     for (const course of courses.value) {
       const resp = await axios.get(
-        `http://127.0.0.1:8000/faculty/${userId}/students/${course}`
+        `${apiConfig.baseURL}/faculty/${userId}/students/${course}`
       );
       students.value.push(resp.data);
 
@@ -194,7 +195,7 @@ async function markAttendance(course_id, student_id, student_name) {
 
   try {
     const resp = await axios.post(
-      "http://127.0.0.1:8000/faculty/mark-attendance",
+      apiConfig.url("faculty/mark-attendance"),
       payload
     );
     if (resp.status === 200 || resp.status === 201) {

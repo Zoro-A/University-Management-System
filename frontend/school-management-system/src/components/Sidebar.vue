@@ -74,6 +74,7 @@ const menuItems = computed(() => {
     { title: "My Courses", link: "/scourses", img: myCourses },
     { title: "Transcript", link: "/transcript", img: transcript },
     { title: "Add or drop course", link: "/Sadddropcourse", img: removeCourse },
+    { title: "Notifications", link: "/Snotifications", img: notification },
   ];
 
   const faculty = [

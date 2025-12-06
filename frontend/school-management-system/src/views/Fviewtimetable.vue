@@ -34,6 +34,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 const timetable = ref([]);
@@ -50,7 +51,7 @@ async function fetchTimetable() {
 
   loading.value = true;
   try {
-    const url = `http://127.0.0.1:8000/faculty/${encodeURIComponent(
+    const url = `${apiConfig.baseURL}/faculty/${encodeURIComponent(
       userId
     )}/timetable`;
     const res = await axios.get(url);

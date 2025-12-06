@@ -37,6 +37,7 @@
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const transcript = ref({});
 const loading = ref(false);
@@ -64,7 +65,7 @@ async function fetchTranscript() {
   loading.value = true;
 
   try {
-    const url = `http://127.0.0.1:8000/student/${encodeURIComponent(
+    const url = `${apiConfig.baseURL}/student/${encodeURIComponent(
       sid
     )}/transcript`;
     const res = await axios.get(url);

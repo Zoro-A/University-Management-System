@@ -104,7 +104,7 @@ class AdminModel(UserModel):
 
     def remove_user(self, user_id):
         self.student_repo.delete(user_id)
-        self.faculty_repo.delete(user_id)
+        #self.faculty_repo.delete(user_id)
 
     def list_users(self):
         students = self.student_repo.get_all() or []

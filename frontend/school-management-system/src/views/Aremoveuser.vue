@@ -14,6 +14,7 @@
 import axios from "axios";
 import { ref } from "vue";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 
@@ -30,7 +31,7 @@ async function submitRemove() {
   console.log("Sending remove-user payload:", payload);
 
   try {
-    await axios.post("http://127.0.0.1:8000/admin/faculty/add", payload);
+    await axios.post(apiConfig.url("admin/user/remove"), payload);
     alert("✅ Request sent successfully");
     user.value.user_id = "";
   } catch (err) {

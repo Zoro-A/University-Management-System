@@ -1,6 +1,7 @@
 <template>
   <div class="login-page">
     <div class="login-card">
+      <button class="back-button" @click="goBackToRoleSelect">← Back to Role Selection</button>
       <h2>Login</h2>
 
       <input type="text" placeholder="Email" v-model="email" />
@@ -18,6 +19,7 @@ import axios from "axios";
 import { userRolestore } from "../store/rolestore";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 const router = useRouter();
@@ -25,9 +27,15 @@ const router = useRouter();
 const email = ref("");
 const password = ref("");
 
+function goBackToRoleSelect() {
+  // Reset the role and navigate back to role selection
+  store.resetAll();
+  router.push("/");
+}
+
 async function login() {
   try {
-    const response = await axios.post("http://127.0.0.1:8000/auth/login", {
+    const response = await axios.post(apiConfig.url("auth/login"), {
       email: email.value,
       password: password.value,
       role: store.role,
@@ -82,6 +90,7 @@ async function login() {
 
 /* Login card */
 .login-card {
+  position: relative;
   width: 320px;
   padding: 25px;
   background: white;
@@ -110,6 +119,28 @@ async function login() {
 /* Focus effect */
 .login-card input:focus {
   border-color: #3498db;
+}
+
+/* Back Button */
+.back-button {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #95a5a6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.back-button:hover {
+  background-color: #7f8c8d;
 }
 
 /* Button */

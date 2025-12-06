@@ -36,6 +36,7 @@
 import axios from "axios";
 import { userRolestore } from "../store/rolestore";
 import { ref } from "vue";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 
@@ -74,7 +75,7 @@ async function submitFaculty() {
 
   try {
     const response = await axios.post(
-      "http://127.0.0.1:8000/admin/faculty/add",
+      apiConfig.url("admin/faculty/add"),
       payload
     );
 

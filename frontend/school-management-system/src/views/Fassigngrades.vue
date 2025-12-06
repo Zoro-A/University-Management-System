@@ -63,6 +63,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 
@@ -83,7 +84,7 @@ async function fetchCourses() {
 
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8000/faculty/${userId}/courses`
+      `${apiConfig.baseURL}/faculty/${userId}/courses`
     );
     courses.value = response.data;
   } catch (err) {
@@ -104,7 +105,7 @@ async function getstudents() {
 
     for (const course of courses.value) {
       const response = await axios.get(
-        `http://127.0.0.1:8000/faculty/${userId}/students/${course}`
+        `${apiConfig.baseURL}/faculty/${userId}/students/${course}`
       );
       console.log(response?.data, "check response data");
       students.value.push(response.data);
@@ -151,7 +152,7 @@ async function submitGrade(course_id, student_id) {
 
   try {
     const response = await axios.post(
-      "http://127.0.0.1:8000/faculty/assign-grade",
+      apiConfig.url("faculty/assign-grade"),
       payload
     );
 

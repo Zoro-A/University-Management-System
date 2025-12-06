@@ -1,7 +1,3 @@
-"""
-Backend server runner script.
-Reads port from environment variables and starts the FastAPI server.
-"""
 import os
 import uvicorn
 from dotenv import load_dotenv

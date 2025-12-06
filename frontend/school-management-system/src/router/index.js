@@ -19,6 +19,7 @@ import Fviewtimetable from '../views/Fviewtimetable.vue'
 import FsendNotifications from '../views/FsendNotifications.vue'
 import Sadddropcourse from '../views/Sadddropcourse.vue'
 import Sviewcourses from '../views/Sviewcourses.vue'
+import Snotifications from '../views/Snotifications.vue'
 
 import fdashboard from '../views/fdashboard.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -44,7 +45,8 @@ const routes = [
      {path:'/fdashboard', component: fdashboard},
      {path:'/FsendNotifications', component: FsendNotifications},
      {path:'/Sadddropcourse', component: Sadddropcourse},
-{path:'/scourses', component: Sviewcourses}
+{path:'/scourses', component: Sviewcourses},
+     {path:'/Snotifications', component: Snotifications}
 
 ]
 

@@ -9,6 +9,7 @@
       <router-link to="/Sadddropcourse" class="card"
         >Add/Drop Course</router-link
       >
+      <router-link to="/Snotifications" class="card">Notifications</router-link>
     </div>
   </div>
 </template>

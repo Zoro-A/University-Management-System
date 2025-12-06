@@ -14,6 +14,7 @@
 import axios from "axios";
 import { ref } from "vue";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 
@@ -40,7 +41,7 @@ async function submitCourse() {
   console.log("Sending:", payload);
 
   try {
-    await axios.post("http://127.0.0.1:8000/admin/courses/remove", payload);
+    await axios.post(apiConfig.url("admin/courses/remove"), payload);
     alert("✅ Course Removed Successfully!");
     course.value.course_id = "";
   } catch (err) {

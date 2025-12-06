@@ -16,9 +16,12 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { ref } from "vue";
+import { userRolestore } from "../store/rolestore";
 
 const dropdownOpen = ref(false);
 const router = useRouter();
+const store = userRolestore();
+
 function toggleDropdown() {
   dropdownOpen.value = !dropdownOpen.value;
 }
@@ -33,9 +36,12 @@ function logout() {
 
   // Remove user data from localStorage
   localStorage.removeItem("userData");
+  
+  // Reset the store
+  store.resetAll();
 
-  // Navigate to login page
-  router.replace("/login");
+  // Navigate to role selection page
+  router.replace("/");
 }
 </script>
 

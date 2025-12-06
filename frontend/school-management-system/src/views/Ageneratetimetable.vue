@@ -20,6 +20,7 @@
 import { ref } from "vue";
 import axios from "axios";
 import { userRolestore } from "../store/rolestore";
+import apiConfig from "../config/api";
 
 const store = userRolestore();
 
@@ -42,7 +43,7 @@ async function submitGenerate() {
   console.log("Sending generate timetable payload:", payload);
 
   try {
-    await axios.post("http://127.0.0.1:8000/admin/timetable/generate", payload);
+    await axios.post(apiConfig.url("admin/timetable/generate"), payload);
     alert("✅ Timetable generation request sent");
     rooms.value = [""];
   } catch (err) {
